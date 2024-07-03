@@ -1,0 +1,12 @@
+[browser]
+gatherUsageStats = false
+
+[theme]
+base = "dark"
+
+[client]
+showSidebarNavigation = false
+
+[runner]
+fastReruns = false
+magicEnabled = false
