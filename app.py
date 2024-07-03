@@ -6,6 +6,7 @@ import polars as pl
 import streamlit_antd_components as sac
 
 from data import get_all_sheets
+from sidebar import generate_actionsheets_tree_items, generate_actionsheets_tree_lookup
 from views.landing import generate_landing_view
 
 st.set_page_config(
@@ -17,6 +18,9 @@ st.set_page_config(
 
 if 'lang' not in st.session_state:
     st.session_state.lang = 'Python'
+
+if 'sheet_id' not in st.session_state:
+    st.session_state.sheet_id = ''
 
 sheets = get_all_sheets()
 
@@ -42,6 +46,7 @@ with st.sidebar:
 
     if lang_select:
         st.session_state.lang = lang_select
+        st.session_state.sheet_id = ''
 
     general_search = st.text_input(
         label='Search all',
@@ -51,18 +56,25 @@ with st.sidebar:
     )
 
     sac.divider(f'{lang_select} actionsheets', color='green', size='lg')
-    sac.tree(items=[
-        sac.TreeItem('Scalars', children=[
-            sac.TreeItem('datetime'),
-            sac.TreeItem('numeric'),
-            sac.TreeItem('str'),
-        ], tooltip='item tooltip'),
-        sac.TreeItem('Collections', children=[
-            sac.TreeItem('tuple'),
-            sac.TreeItem('list'),
-            sac.TreeItem('dict'),
-        ]),
-    ], label='', index=-1, size='md', color='green', show_line=False, return_index=True)
+    actionsheets_tree_lookup = generate_actionsheets_tree_lookup(st.session_state.lang)
+    actionsheets_tree = sac.tree(
+        items=generate_actionsheets_tree_items(st.session_state.lang),
+        label='',
+        index=-1,
+        open_all=True,
+        size='sm',
+        color='green',
+        show_line=False,
+        return_index=True
+    )
+
+    if len(actionsheets_tree_lookup) > 0 and type(actionsheets_tree) is int:
+        if actionsheets_tree == -1:
+            st.session_state.sheet_id = st.session_state.lang.lower()
+        else:
+            st.session_state.sheet_id = actionsheets_tree_lookup[actionsheets_tree]
+
+        print(f'Selected index: {actionsheets_tree}, sheet id: {st.session_state.sheet_id}')
 
     search_sheet = st.text_input(
         label='Search sheet',
@@ -71,7 +83,12 @@ with st.sidebar:
         disabled=True
     )
 
-    sac.divider('Tuple sections', color='yellow', size='md')
+    if st.session_state.sheet_id in sheets.sheets_data['sheet_id']:
+        sheet_name = sheets.sheet_info(st.session_state.sheet_id)['title']
+    else:
+        sheet_name = 'UNDEFINED'
+
+    sac.divider(f'{sheet_name} sections', color='yellow', icon='code', size='md')
     sac.tree(items=[
         sac.TreeItem('Create', children=[
             sac.TreeItem('datetime'),
