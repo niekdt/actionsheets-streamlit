@@ -1,15 +1,15 @@
 import polars as pl
 import streamlit as st
 import streamlit_antd_components as sac
+
 from streamlit_extras.grid import grid
-
-from data import get_all_sheets
 from ui import stylable_metric
-
-sheets = get_all_sheets()
+from data import get_all_sheets
 
 
 def generate_landing_view():
+    sheets = get_all_sheets()
+
     st.title('Actionsheets')
 
     all_langs = sorted(['Julia', 'Python', 'R', 'MATLAB', 'Stan'])

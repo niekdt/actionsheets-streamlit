@@ -1,20 +1,19 @@
 from os import path
 
 import streamlit as st
+
 import polars as pl
 import streamlit_antd_components as sac
 
 from data import get_all_sheets
 from views.landing import generate_landing_view
 
-if 'config' not in st.session_state:
-    st.set_page_config(
-        page_title='Actionsheets',
-        page_icon='🧪',
-        initial_sidebar_state='expanded',
-        layout='wide'
-    )
-    st.session_state.config = True
+st.set_page_config(
+    page_title='Actionsheets',
+    page_icon='🧪',
+    initial_sidebar_state='expanded',
+    layout='wide'
+)
 
 sheets = get_all_sheets()
 
