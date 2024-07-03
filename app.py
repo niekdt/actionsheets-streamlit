@@ -15,27 +15,33 @@ st.set_page_config(
     layout='wide'
 )
 
+if 'lang' not in st.session_state:
+    st.session_state.lang = 'Python'
+
 sheets = get_all_sheets()
 
 # Import CSS file
 with open(path.join('.streamlit', 'style.css')) as f:
     st.sidebar.markdown(f'<style>{f.read()}</style>', unsafe_allow_html=True)
 
-if 'new' not in st.session_state:
-    generate_landing_view()
-
 # Sidebar
 with st.sidebar:
     st.title('Actionsheets')
 
     sac.divider('Programming language', color='blue', size='xl')
-    proglang_select = st.selectbox(
+    langs = sorted(sheets.sheets_data.filter(pl.col('sheet_parent') == '')['title'])
+
+    lang_select = st.selectbox(
+        key='lang_select',
         label='Programming language',
         placeholder='Select proglang',
-        index=0,
-        options=sorted(sheets.sheets_data.filter(pl.col('sheet_parent') == '')['title']),
+        index=langs.index(st.session_state.lang),
+        options=langs,
         label_visibility='collapsed'
     )
+
+    if lang_select:
+        st.session_state.lang = lang_select
 
     general_search = st.text_input(
         label='Search all',
@@ -44,7 +50,7 @@ with st.sidebar:
         disabled=True
     )
 
-    sac.divider(f'{proglang_select} actionsheets', color='green', size='lg')
+    sac.divider(f'{lang_select} actionsheets', color='green', size='lg')
     sac.tree(items=[
         sac.TreeItem('Scalars', children=[
             sac.TreeItem('datetime'),
@@ -108,3 +114,6 @@ with st.sidebar:
         ),
         sac.MenuItem('Copyright © 2024 Niek Den Teuling', disabled=True)
     ], size='xs', indent=10)
+
+if 'new' not in st.session_state:
+    generate_landing_view()
