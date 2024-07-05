@@ -5,16 +5,10 @@ import streamlit as st
 import polars as pl
 import streamlit_antd_components as sac
 
-from data import get_all_sheets
-from sidebar import generate_actionsheets_tree_items, generate_actionsheets_tree_lookup
+from data import get_all_sheets, get_active_sheet_id
+from sidebar import generate_actionsheets_tree_items, generate_actionsheets_tree_lookup, generate_sections_tree_items
 from views.landing import generate_landing_view
-
-st.set_page_config(
-    page_title='Actionsheets',
-    page_icon='🧪',
-    initial_sidebar_state='expanded',
-    layout='wide'
-)
+from views.sheet import generate_sheet_view
 
 if 'lang' not in st.session_state:
     st.session_state.lang = 'Python'
@@ -83,28 +77,32 @@ with st.sidebar:
         disabled=True
     )
 
-    if st.session_state.sheet_id in sheets.sheets_data['sheet_id']:
-        sheet_name = sheets.sheet_info(st.session_state.sheet_id)['title']
-    else:
-        sheet_name = 'UNDEFINED'
+if get_active_sheet_id() in sheets.sheets_data['sheet_id']:
+    sheet_name = sheets.sheet_info(st.session_state.sheet_id)['title']
+    generate_sheet_view(get_active_sheet_id())
+else:
+    sheet_name = ''
+    generate_landing_view()
 
-    sac.divider(f'{sheet_name} sections', color='yellow', icon='code', size='md')
-    sac.tree(items=[
-        sac.TreeItem('Create', children=[
-            sac.TreeItem('datetime'),
-            sac.TreeItem('numeric'),
-            sac.TreeItem('str'),
-        ], tooltip='item tooltip'),
-        sac.TreeItem('Test', children=[
-            sac.TreeItem('tuple'),
-            sac.TreeItem('list'),
-            sac.TreeItem('dict'),
-        ]),
-        sac.TreeItem('Extract'),
-        sac.TreeItem('Update'),
-        sac.TreeItem('Derive'),
-        sac.TreeItem('Convert'),
-    ], label='', index=-1, size='sm', color='yellow', show_line=False, return_index=True)
+with st.sidebar:
+    sac.divider(
+        f'{sheet_name} sections' if sheet_name else 'Sections',
+        color='yellow',
+        size='md'
+    )
+
+    section_items = generate_sections_tree_items(get_active_sheet_id(), '')
+
+    if section_items:
+        section_tree = sac.tree(
+            items=section_items,
+            label='',
+            index=-1,
+            size='sm',
+            color='yellow',
+            show_line=False,
+            return_index=True
+        )
 
     search_snippet = st.text_input(
         label='Search snippet',
@@ -131,6 +129,3 @@ with st.sidebar:
         ),
         sac.MenuItem('Copyright © 2024 Niek Den Teuling', disabled=True)
     ], size='xs', indent=10)
-
-if 'new' not in st.session_state:
-    generate_landing_view()

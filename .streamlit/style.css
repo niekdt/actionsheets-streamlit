@@ -1,8 +1,24 @@
+:root {
+    --bg-color: #0E1117;
+    --table-color: #1D2330;
+    --lang-color: #228BE6;
+    --sheet-color: #40C057;
+    --section-color: #FAB005;
+}
+
 /* hide top bar */
-header[data-testid="stHeader"] {height: 0px}
+header[data-testid="stHeader"] {
+    height: 0px
+}
 
 /* reduce page margins */
-.block-container {padding-top: 0; padding-left: 15pt; padding-right: 10pt}
+.block-container {
+    padding-top: 0;
+    padding-left: 15pt;
+    padding-right: 10pt
+}
 
 /* sidebar style */
-.stApp [data-testid="stSidebar"]>div:nth-child(1)>div:nth-child(2){padding-top:0px}
+.stApp [data-testid="stSidebar"] > div:nth-child(1) > div:nth-child(2) {
+    padding-top:0px
+}

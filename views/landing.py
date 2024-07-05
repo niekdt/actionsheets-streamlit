@@ -35,7 +35,7 @@ def generate_landing_view():
             label='Programming languages',
             value=f'{len(sheets.ids()):,d}',
             icon=r'\e13e',
-            background_color='#228BE6'
+            background_color='var(--lang-color)'
         )
 
     with metric_grid.container():
@@ -43,7 +43,7 @@ def generate_landing_view():
             label='Actionsheets',
             value=f'{sheets.sheets_data.height:,d}',
             icon=r'\F388',
-            background_color='#40C057'
+            background_color='var(--sheet-color)'
         )
 
     with metric_grid.container():
@@ -51,7 +51,7 @@ def generate_landing_view():
             label='Code snippets',
             value=f'{sheets.snippets_data.height:,d}',
             icon=r'\e86f',
-            background_color='#FAB005'
+            background_color='var(--section-color)'
         )
 
     st.markdown('''

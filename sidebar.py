@@ -1,5 +1,3 @@
-import itertools
-
 from streamlit_antd_components import TreeItem
 
 from data import get_all_sheets
@@ -25,3 +23,7 @@ def generate_actionsheets_tree_lookup(parent: str) -> list[str]:
     for sheet_id in ids:
         out += [sheet_id] + generate_actionsheets_tree_lookup(sheet_id)
     return out
+
+
+def generate_sections_tree_items(sheet_id: str, parent_section: str) -> list[TreeItem]:
+    return []
