@@ -6,7 +6,7 @@ import polars as pl
 import streamlit_antd_components as sac
 
 from data import get_all_sheets, get_active_sheet_id
-from sidebar import generate_actionsheets_tree_items, generate_actionsheets_tree_lookup, sheet_toc
+from sidebar import generate_actionsheets_items, sheet_toc, get_sheet_title
 from views.landing import generate_landing_view
 from views.sheet import generate_sheet_view
 
@@ -50,25 +50,24 @@ with st.sidebar:
     )
 
     sac.divider(f'{lang_select} actionsheets', color='green', size='lg')
-    actionsheets_tree_lookup = generate_actionsheets_tree_lookup(st.session_state.lang)
-    actionsheets_tree = sac.tree(
-        items=generate_actionsheets_tree_items(st.session_state.lang),
-        label='',
-        index=-1,
-        open_all=True,
+    actionsheets_menu = sac.menu(
+        items=generate_actionsheets_items(st.session_state.lang),
+        index=0,  # an item must be selected, otherwise the component does not expand correctly
+        indent=10,
+        open_all=False,
         size='sm',
         color='green',
-        show_line=False,
-        return_index=True
+        format_func=get_sheet_title
     )
 
-    if len(actionsheets_tree_lookup) > 0 and type(actionsheets_tree) is int:
-        if actionsheets_tree == -1:
+    print(actionsheets_menu)
+    if len(actionsheets_menu) > 0:
+        if actionsheets_menu == '':
             st.session_state.sheet_id = st.session_state.lang.lower()
         else:
-            st.session_state.sheet_id = actionsheets_tree_lookup[actionsheets_tree]
+            st.session_state.sheet_id = actionsheets_menu
 
-        print(f'Selected index: {actionsheets_tree}, sheet id: {st.session_state.sheet_id}')
+        print(f'Selected sheet: {st.session_state.sheet_id}')
 
     search_sheet = st.text_input(
         label='Search sheet',
@@ -92,10 +91,12 @@ with st.sidebar:
         size='md'
     )
 
-    sheet_toc(
-        sheet=sheets.sheet_view(id=get_active_sheet_id()),
-        parent_section=''
-    )
+    if len(get_active_sheet_id()) > 0:
+        print('RENDER TOC')
+        sheet_toc(
+            sheet=sheets.sheet_view(id=get_active_sheet_id()),
+            parent_section=''
+        )
 
     search_snippet = st.text_input(
         label='Search snippet',

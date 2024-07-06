@@ -1,70 +1,36 @@
 from actionsheets.sheet import ActionsheetView
 import streamlit as st
-from streamlit_antd_components import TreeItem
+from streamlit_antd_components import MenuItem
 
 from data import get_all_sheets
 
 sheets = get_all_sheets()
 
 
-def generate_actionsheets_tree_items(parent: str) -> list[TreeItem]:
+def generate_actionsheets_items(parent: str) -> list[MenuItem]:
     ids = sheets.ids(parent_id=parent.lower())
 
-    return [
-        TreeItem(
-            label=sheets.sheet_info(sheet_id)['title'],
-            children=generate_actionsheets_tree_items(sheet_id)
-        ) for sheet_id in ids
-    ]
+    def generate_children(sheet_id: str) -> MenuItem:
+        child_items = generate_actionsheets_items(sheet_id)
+
+        if child_items:
+            return MenuItem(label=sheet_id, children=child_items)
+        else:
+            return MenuItem(label=sheet_id, icon='file-earmark-fill')
+
+    return list(map(generate_children, ids))
 
 
-def generate_actionsheets_tree_lookup(parent: str) -> list[str]:
-    ids = sheets.ids(parent_id=parent.lower())
-
-    out = []
-    for sheet_id in ids:
-        out += [sheet_id] + generate_actionsheets_tree_lookup(sheet_id)
-    return out
+def get_sheet_title(section: str) -> str:
+    if section:
+        return sheets.sheet_info(id=section)['title']
+    else:
+        return ''
 
 
 def sheet_toc(sheet: ActionsheetView, parent_section: str):
     html_content = generate_sections_list_html(sheet, parent_section=parent_section)
 
-    st.html('''
-    <style>
-        ul[class="toc"] li ul li a {
-            text-decoration: inherit;
-            color: inherit;
-        }
-        ul[class="toc"] a {
-            text-decoration: inherit;
-            color: var(--section-color);
-            padding-left: 0px;
-            padding-right: 2px;
-        }
-        ul[class="toc"] li {
-            list-style: none;
-            margin-left: 5px;
-            line-height: 130%;
-        }
-        ul[class="toc"] li ul li {
-            list-style: none;
-            margin-left: 5px;
-        }
-        ul[class="toc"] li ul li ul li {
-            list-style: none;
-            margin-left: 15px;
-            font-size: 9pt;
-            color: silver;
-        }
-        ul[class="toc"] li ul > li:before {
-          content: "·";
-        }
-        ul[class="toc"] a:hover {
-            background-color: #505158;
-            border-radius: 5px;
-        }
-    </style>''')
     st.html(f'<ul class="toc">{html_content}</ul>')
 
 

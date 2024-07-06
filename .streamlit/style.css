@@ -18,6 +18,11 @@ header[data-testid="stHeader"] {
     padding-right: 10pt
 }
 
+/* workaround for randomly disappearing st.html outputs... */
+.element-container {
+    display: inline;
+}
+
 /* sidebar style */
 .stApp [data-testid="stSidebar"] > div:nth-child(1) > div:nth-child(2) {
     padding-top:0px
@@ -35,4 +40,72 @@ header[data-testid="stHeader"] {
 h4.sheet {
     padding-bottom: 0px;
     margin-bottom: 0px;
+}
+
+
+table {
+    width: 100%;
+}
+th {
+    color: #FFE1A5;
+}
+td {
+    border: 5px solid var(--bg-color);
+    background-color: var(--table-color);
+    padding-left: 5px;
+}
+td:nth-child(1) {
+    width: 30%;
+}
+td:nth-child(2) {
+    overflow: hidden;
+    width: 50%;
+    padding-left: 1px;
+    padding-right: 1px;
+}
+td:nth-child(3) {
+    width: 20%;
+}
+div[class="highlight"] > pre {
+    margin: 0px;
+    padding: 1px;
+    padding-left: 10px;
+    background-color: var(--table-color);
+}
+table tr:hover td {
+    filter: brightness(1.2);
+}
+
+
+ul[class="toc"] li ul li a {
+    text-decoration: inherit;
+    color: inherit;
+}
+ul[class="toc"] a {
+    text-decoration: inherit;
+    color: var(--section-color);
+    padding-left: 0px;
+    padding-right: 2px;
+}
+ul[class="toc"] li {
+    list-style: none;
+    margin-left: 5px;
+    line-height: 130%;
+}
+ul[class="toc"] li ul li {
+    list-style: none;
+    margin-left: 5px;
+}
+ul[class="toc"] li ul li ul li {
+    list-style: none;
+    margin-left: 15px;
+    font-size: 9pt;
+    color: silver;
+}
+ul[class="toc"] li ul > li:before {
+  content: "\B7";
+}
+ul[class="toc"] a:hover {
+    background-color: #505158;
+    border-radius: 5px;
 }

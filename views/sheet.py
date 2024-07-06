@@ -29,13 +29,6 @@ def generate_sheet_view(sheet_id: str):
         <h1 class="sheet" style="padding-top: 0px;">{sheet_info["title"]} actionsheet</h1>
     ''')
 
-    st.html('''<style>
-    h2, h3, h4 {
-        color: var(--section-color);
-    }
-    </style>''')
-    # with stylable_container(key='sheettitle', css_styles='h1 {color: #FAB005}'):
-    #     st.title(f'{sheet_info["title"]} actionsheet')
     st.html('<h4 class="sheet">Description</h4>')
     st.markdown(sheet_info['description'])
 
@@ -48,6 +41,7 @@ def generate_sheet_view(sheet_id: str):
 
 def generate_sections(view: ActionsheetView, section: str):
     for section_id in view.child_ids(section=section, type='section'):
+        print(f'Generate section {section_id}')
         generate_section(view, section=section_id)
 
 
@@ -57,7 +51,7 @@ def generate_section(view: ActionsheetView, section: str):
     depth = section.count('.')
     h = 2 + depth if depth < 6 else 6
 
-    st.html(f'<h{h}><a id={section}></a> {info["title"]} </h2>')
+    st.html(f'<h{h} class="section"><a id={section}></a> {info["title"]} </h2>')
     if info['description']:
         st.markdown(info['description'])
 
@@ -93,44 +87,6 @@ def generate_snippets(data: pl.DataFrame):
         pl.col('Code').apply(html_code, return_dtype=pl.String)
     )
 
-    st.html('''<style>
-            table { 
-                width: 100%;
-            }
-            th {
-                color: #FFE1A5;
-            }
-            td {
-                border: 5px solid var(--bg-color);
-                background-color: var(--table-color);
-                padding-left: 5px;
-            }
-            td:nth-child(1) {
-                width: 30%;
-            }
-            td:nth-child(2) {
-                overflow: hidden;
-                width: 50%;
-                padding-left: 1px;
-                padding-right: 1px;
-            }
-            td:nth-child(3) {
-                width: 20%;
-            }
-            div[class="highlight"] > pre {
-                margin: 0px;
-                padding: 1px;
-                padding-left: 10px;
-                background-color: var(--table-color);
-            }
-            table tr:hover td {
-                filter: brightness(1.2);
-            }
-        </style>''')
-
     st.html(
-        pretty_data.to_pandas().to_markdown(
-            index=False,
-            tablefmt="unsafehtml"
-        )
+        pretty_data.to_pandas().to_markdown(index=False, tablefmt='unsafehtml')
     )
