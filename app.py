@@ -6,7 +6,7 @@ import polars as pl
 import streamlit_antd_components as sac
 
 from data import get_all_sheets, get_active_sheet_id
-from sidebar import generate_actionsheets_tree_items, generate_actionsheets_tree_lookup, generate_sections_tree_items
+from sidebar import generate_actionsheets_tree_items, generate_actionsheets_tree_lookup, sheet_toc
 from views.landing import generate_landing_view
 from views.sheet import generate_sheet_view
 
@@ -20,7 +20,7 @@ sheets = get_all_sheets()
 
 # Import CSS file
 with open(path.join('.streamlit', 'style.css')) as f:
-    st.sidebar.markdown(f'<style>{f.read()}</style>', unsafe_allow_html=True)
+    st.sidebar.html(f'<style>{f.read()}</style>')
 
 # Sidebar
 with st.sidebar:
@@ -77,6 +77,7 @@ with st.sidebar:
         disabled=True
     )
 
+
 if get_active_sheet_id() in sheets.sheets_data['sheet_id']:
     sheet_name = sheets.sheet_info(st.session_state.sheet_id)['title']
     generate_sheet_view(get_active_sheet_id())
@@ -91,18 +92,10 @@ with st.sidebar:
         size='md'
     )
 
-    section_items = generate_sections_tree_items(get_active_sheet_id(), '')
-
-    if section_items:
-        section_tree = sac.tree(
-            items=section_items,
-            label='',
-            index=-1,
-            size='sm',
-            color='yellow',
-            show_line=False,
-            return_index=True
-        )
+    sheet_toc(
+        sheet=sheets.sheet_view(id=get_active_sheet_id()),
+        parent_section=''
+    )
 
     search_snippet = st.text_input(
         label='Search snippet',
@@ -121,7 +114,8 @@ with st.sidebar:
             href='https://github.com/niekdt/actionsheets/issues'
         ),
         sac.MenuItem('Streamlit website', disabled=True),
-        sac.MenuItem('Github', icon='github', href='https://github.com/niekdt/actionsheets-streamlit'),
+        sac.MenuItem('Github', icon='github',
+                     href='https://github.com/niekdt/actionsheets-streamlit'),
         sac.MenuItem(
             label='Submit an issue',
             icon='question-circle',

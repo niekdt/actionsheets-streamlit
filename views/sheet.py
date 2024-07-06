@@ -17,17 +17,17 @@ def generate_sheet_view(sheet_id: str):
         del sheet_path[-1]
     lang_html = f'<span style="color: var(--lang-color)">{sheet_path[0]}</span>'
     sheets_path_html = (
-        '<span style="color: var(--sheet-color)">' +
-        '</span> › <span style="color: var(--sheet-color);">'.join(sheet_path[1:])
+        '<span class="sheet">' +
+        '</span> › <span class="sheet">'.join(sheet_path[1:])
     )
-    st.markdown(f'''
+    st.html(f'''
         <div style="margin-top: 20px; font-size: 16pt">
             {lang_html}
              › 
             {sheets_path_html}
         </div>
-        <h1 style="padding-top: 0px; color: var(--sheet-color);">{sheet_info["title"]} actionsheet</h1>
-    ''', unsafe_allow_html=True)
+        <h1 class="sheet" style="padding-top: 0px;">{sheet_info["title"]} actionsheet</h1>
+    ''')
 
     st.html('''<style>
     h2, h3, h4 {
@@ -36,11 +36,11 @@ def generate_sheet_view(sheet_id: str):
     </style>''')
     # with stylable_container(key='sheettitle', css_styles='h1 {color: #FAB005}'):
     #     st.title(f'{sheet_info["title"]} actionsheet')
-    st.markdown('#### Description')
+    st.html('<h4 class="sheet">Description</h4>')
     st.markdown(sheet_info['description'])
 
     if 'details' in sheet_info and sheet_info['details']:
-        st.markdown('#### Details')
+        st.html('<h4 class="sheet">Details</h4>')
         st.markdown(sheet_info['details'])
 
     generate_sections(sheet, section='')
@@ -54,7 +54,10 @@ def generate_sections(view: ActionsheetView, section: str):
 def generate_section(view: ActionsheetView, section: str):
     info = view.section_info(section=section)
 
-    st.subheader(info['title'])
+    depth = section.count('.')
+    h = 2 + depth if depth < 6 else 6
+
+    st.html(f'<h{h}><a id={section}></a> {info["title"]} </h2>')
     if info['description']:
         st.markdown(info['description'])
 
@@ -124,15 +127,6 @@ def generate_snippets(data: pl.DataFrame):
                 filter: brightness(1.2);
             }
         </style>''')
-
-    # st.html(
-    #     tabulate(
-    #         pretty_data.to_pandas(),
-    #         showindex=False,
-    #         headers="firstrow",
-    #         tablefmt="unsafehtml"
-    #     )
-    # )
 
     st.html(
         pretty_data.to_pandas().to_markdown(
