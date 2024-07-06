@@ -20,7 +20,12 @@ header[data-testid="stHeader"] {
 
 /* workaround for randomly disappearing st.html outputs... */
 .element-container {
-    display: inline;
+    display: inline !important;
+}
+
+/* second workaround for stubborn empty-html issue... */
+div[class$="empty-html"] {
+    display: inline !important;
 }
 
 /* sidebar style */

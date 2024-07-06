@@ -92,7 +92,6 @@ with st.sidebar:
     )
 
     if len(get_active_sheet_id()) > 0:
-        print('RENDER TOC')
         sheet_toc(
             sheet=sheets.sheet_view(id=get_active_sheet_id()),
             parent_section=''
