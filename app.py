@@ -4,6 +4,7 @@ import streamlit as st
 
 import polars as pl
 import streamlit_antd_components as sac
+from streamlit_extras.stylable_container import stylable_container
 
 from data import get_all_sheets, get_active_sheet_id
 from sidebar import generate_actionsheets_items, sheet_toc, get_sheet_title
@@ -22,9 +23,23 @@ sheets = get_all_sheets()
 with open(path.join('.streamlit', 'style.css')) as f:
     st.sidebar.html(f'<style>{f.read()}</style>')
 
+freeze = False
+
 # Sidebar
 with st.sidebar:
-    st.title('Actionsheets')
+    with stylable_container(
+            key='home',
+            css_styles=[
+                'div {float: left; width: 100%; text-align: left;}',
+                'button {border-style: none; background-color: transparent; float:left;}',
+                'button:hover {color: inherit}',
+                'p {font-size: 24pt; font-weight: bold;}'
+            ]
+    ):
+        home_button = st.button('Actionsheets', use_container_width=True)
+
+    if home_button:
+        st.session_state.sheet_id = ''
 
     sac.divider('Programming language', color='blue', size='xl')
     langs = sorted(sheets.sheets_data.filter(pl.col('sheet_parent') == '')['title'])
@@ -38,10 +53,15 @@ with st.sidebar:
         label_visibility='collapsed'
     )
 
-    if lang_select:
+    print(lang_select)
+    if not home_button and lang_select and st.session_state.lang != lang_select:
+        print('SELECT LANG')
         st.session_state.lang = lang_select
         st.session_state.sheet_id = ''
+        freeze = True
 
+
+with st.sidebar:
     general_search = st.text_input(
         label='Search all',
         placeholder='Quick search',
@@ -60,11 +80,8 @@ with st.sidebar:
         format_func=get_sheet_title
     )
 
-    print(actionsheets_menu)
-    if len(actionsheets_menu) > 0:
-        if actionsheets_menu == '':
-            st.session_state.sheet_id = st.session_state.lang.lower()
-        elif actionsheets_menu in sheets.sheets_data['sheet_id']:
+    if not home_button and len(actionsheets_menu) > 0:
+        if actionsheets_menu in sheets.sheets_data['sheet_id']:
             st.session_state.sheet_id = actionsheets_menu
 
         print(f'Selected sheet: {st.session_state.sheet_id}')
@@ -78,8 +95,12 @@ with st.sidebar:
 
 
 if get_active_sheet_id() in sheets.sheets_data['sheet_id']:
+    print('Show sheet')
     sheet_name = sheets.sheet_info(st.session_state.sheet_id)['title']
     generate_sheet_view(get_active_sheet_id())
+elif len(get_active_sheet_id()) > 0:
+    sheet_name = ''
+    sac.result('Not found')
 else:
     sheet_name = ''
     generate_landing_view()
@@ -104,22 +125,26 @@ with st.sidebar:
         disabled=True
     )
 
-    sac.menu(items=[
-        sac.MenuItem(type='divider'),
-        sac.MenuItem('Actionsheets package', disabled=True),
-        sac.MenuItem('Github', icon='github', href='https://github.com/niekdt/actionsheets'),
-        sac.MenuItem(
-            label='Submit an issue / snippet',
-            icon='question-circle',
-            href='https://github.com/niekdt/actionsheets/issues'
-        ),
-        sac.MenuItem('Streamlit website', disabled=True),
-        sac.MenuItem('Github', icon='github',
-                     href='https://github.com/niekdt/actionsheets-streamlit'),
-        sac.MenuItem(
-            label='Submit an issue',
-            icon='question-circle',
-            href='https://github.com/niekdt/actionsheets/issues'
-        ),
-        sac.MenuItem('Copyright © 2024 Niek Den Teuling', disabled=True)
-    ], size='xs', indent=10)
+    sac.menu(
+        items=[
+            sac.MenuItem(type='divider'),
+            sac.MenuItem('Actionsheets package', disabled=True),
+            sac.MenuItem('Github', icon='github', href='https://github.com/niekdt/actionsheets'),
+            sac.MenuItem(
+                label='Submit an issue / snippet',
+                icon='question-circle',
+                href='https://github.com/niekdt/actionsheets/issues'
+            ),
+            sac.MenuItem('Streamlit website', disabled=True),
+            sac.MenuItem('Github', icon='github',
+                         href='https://github.com/niekdt/actionsheets-streamlit'),
+            sac.MenuItem(
+                label='Submit an issue',
+                icon='question-circle',
+                href='https://github.com/niekdt/actionsheets/issues'
+            ),
+            sac.MenuItem('Copyright © 2024 Niek Den Teuling', disabled=True)
+        ],
+        size='xs',
+        indent=10
+    )

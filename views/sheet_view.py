@@ -72,7 +72,6 @@ def generate_sheet_view(sheet_id: str):
 
 def generate_sections(view: ActionsheetView, section: str):
     for section_id in view.child_ids(section=section, type='section'):
-        print(f'Generate section {section_id}')
         generate_section(view, section=section_id)
 
 
