@@ -4,8 +4,11 @@ from actionsheets.sheet import ActionsheetView
 from pygments import highlight
 from pygments.formatters import HtmlFormatter
 from pygments.lexers import get_lexer_by_name
+from streamlit_extras.row import row
+from streamlit_extras.stylable_container import stylable_container
 
-from data import get_sheet, get_sheet_info
+from data import get_sheet, get_sheet_info, get_all_sheets
+from sidebar import sheet_toc
 
 formatter = HtmlFormatter(style='monokai', linenos=False)
 
@@ -30,15 +33,39 @@ def generate_sheet_view(sheet_id: str):
              › 
             {sheets_path_html}
         </div>
-        <h1 class="sheet" style="padding-top: 0px;">{sheet_info["title"]} actionsheet</h1>
+        <h1 class="sheet" style="padding-top: 0px;"><em>{sheet_info["title"]}</em> actionsheet</h1>
     ''')
 
-    st.html('<h4 class="sheet">Description</h4>')
-    st.markdown(sheet_info['description'])
+    with stylable_container(
+            key='sheet-info',
+            css_styles='''
+    div[data-testid="stHorizontalBlock"] {
+        background-color: var(--table-color); 
+        border-radius: 10px;
+        padding-left: 10px;
+    }
+    div[data-testid="column"]:first-child {
+        border-right: solid;
+        border-color: var(--bg-color);
+        border-width: 10px;
+    } 
+    '''):
+        sheet_info_row = row([2, 1], vertical_align='top')
 
-    if 'details' in sheet_info and sheet_info['details']:
-        st.html('<h4 class="sheet">Details</h4>')
-        st.markdown(sheet_info['details'])
+    with sheet_info_row.container():
+        st.html('<h4 class="sheet">Description</h4>')
+        st.markdown(sheet_info['description'])
+
+        if 'details' in sheet_info and sheet_info['details']:
+            st.html('<h4 class="sheet">Details</h4>')
+            st.markdown(sheet_info['details'])
+
+    with sheet_info_row.container():
+        st.html('<h4 class="sheet">Sections</h4>')
+        sheet_toc(
+            sheet=get_all_sheets().sheet_view(id=sheet_id),
+            parent_section=''
+        )
 
     generate_sections(sheet, section='')
 
