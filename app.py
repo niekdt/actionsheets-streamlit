@@ -7,8 +7,8 @@ import streamlit_antd_components as sac
 
 from data import get_all_sheets, get_active_sheet_id
 from sidebar import generate_actionsheets_items, sheet_toc, get_sheet_title
-from views.landing import generate_landing_view
-from views.sheet import generate_sheet_view
+from views.home_view import generate_landing_view
+from views.sheet_view import generate_sheet_view
 
 if 'lang' not in st.session_state:
     st.session_state.lang = 'Python'
