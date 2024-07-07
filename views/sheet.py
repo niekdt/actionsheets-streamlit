@@ -7,8 +7,12 @@ from pygments.lexers import get_lexer_by_name
 
 from data import get_sheet, get_sheet_info
 
+formatter = HtmlFormatter(style='monokai', linenos=False)
+
 
 def generate_sheet_view(sheet_id: str):
+    st.html('<style>' + formatter.get_style_defs('.highlight') + '</style>')
+
     sheet_info = get_sheet_info(sheet_id)
     sheet = get_sheet(sheet_id)
 
@@ -17,8 +21,8 @@ def generate_sheet_view(sheet_id: str):
         del sheet_path[-1]
     lang_html = f'<span style="color: var(--lang-color)">{sheet_path[0]}</span>'
     sheets_path_html = (
-        '<span class="sheet">' +
-        '</span> › <span class="sheet">'.join(sheet_path[1:])
+            '<span class="sheet">' +
+            '</span> › <span class="sheet">'.join(sheet_path[1:])
     )
     st.html(f'''
         <div style="margin-top: 20px; font-size: 16pt">
@@ -70,14 +74,10 @@ def generate_section_snippets(view: ActionsheetView, section: str):
 def generate_snippets(data: pl.DataFrame):
     assert data.height > 0
 
-    formatter = HtmlFormatter(style='monokai', linenos=False)
     lexer = get_lexer_by_name('Python')
-
-    st.html('<style>' + formatter.get_style_defs('.highlight') + '</style>')
 
     def html_code(code) -> str:
         return highlight(code, lexer, formatter)
-
 
     pretty_data = data.select(
         pl.col('title').alias('What'),
