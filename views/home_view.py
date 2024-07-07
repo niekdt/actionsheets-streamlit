@@ -15,7 +15,7 @@ def generate_landing_view():
     all_langs = sorted(['Julia', 'Python', 'R', 'MATLAB', 'Stan'])
     langs = sheets.sheets_data.filter(pl.col('sheet_parent') == '')['title']
 
-    lang_segmented = sac.segmented(
+    sac.segmented(
         key='lang_segmented',
         items=[sac.SegmentedItem(label=lang, disabled=lang not in langs) for lang in all_langs],
         label='',
@@ -27,10 +27,6 @@ def generate_landing_view():
         disabled=True,
         use_container_width=True
     )
-
-    if lang_segmented:
-        st.session_state.lang = lang_segmented
-        st.session_state.sheet_id = ''
 
     metric_grid = grid(3)
     with metric_grid.container():

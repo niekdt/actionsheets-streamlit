@@ -23,8 +23,6 @@ sheets = get_all_sheets()
 with open(path.join('.streamlit', 'style.css')) as f:
     st.sidebar.html(f'<style>{f.read()}</style>')
 
-freeze = False
-
 # Sidebar
 with st.sidebar:
     with stylable_container(
@@ -48,17 +46,14 @@ with st.sidebar:
         key='lang_select',
         label='Programming language',
         placeholder='Select proglang',
-        index=langs.index(st.session_state.lang),
+        index=0,
         options=langs,
         label_visibility='collapsed'
     )
 
-    print(lang_select)
-    if not home_button and lang_select and st.session_state.lang != lang_select:
-        print('SELECT LANG')
+    if lang_select:
         st.session_state.lang = lang_select
         st.session_state.sheet_id = ''
-        freeze = True
 
 
 with st.sidebar:
