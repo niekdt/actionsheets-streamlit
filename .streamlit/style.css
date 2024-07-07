@@ -11,6 +11,10 @@ header[data-testid="stHeader"] {
     height: 0px
 }
 
+div [data-testid="stSidebarHeader"] {
+    display: none;
+}
+
 /* reduce page margins */
 .block-container {
     padding-top: 0;
