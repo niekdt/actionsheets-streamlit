@@ -64,7 +64,7 @@ with st.sidebar:
     if len(actionsheets_menu) > 0:
         if actionsheets_menu == '':
             st.session_state.sheet_id = st.session_state.lang.lower()
-        else:
+        elif actionsheets_menu in sheets.sheets_data['sheet_id']:
             st.session_state.sheet_id = actionsheets_menu
 
         print(f'Selected sheet: {st.session_state.sheet_id}')

@@ -14,16 +14,21 @@ def generate_actionsheets_items(parent: str) -> list[MenuItem]:
         child_items = generate_actionsheets_items(sheet_id)
 
         if child_items:
-            return MenuItem(label=sheet_id, children=child_items)
+            sheet_info = sheets.sheet_info(id=sheet_id)
+
+            self_item = MenuItem(label=sheet_id, icon='journal-code')
+            if len(sheet_info['description']) > 0:
+                child_items.insert(0, self_item)
+            return MenuItem(label=sheet_id.upper(), children=child_items)
         else:
-            return MenuItem(label=sheet_id, icon='file-earmark')
+            return MenuItem(label=sheet_id, icon='file-earmark-code')
 
     return list(map(generate_children, ids))
 
 
 def get_sheet_title(section: str) -> str:
     if section:
-        return sheets.sheet_info(id=section)['title']
+        return sheets.sheet_info(id=section.lower())['title']
     else:
         return ''
 
