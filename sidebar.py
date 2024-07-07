@@ -16,7 +16,7 @@ def generate_actionsheets_items(parent: str) -> list[MenuItem]:
         if child_items:
             return MenuItem(label=sheet_id, children=child_items)
         else:
-            return MenuItem(label=sheet_id, icon='file-earmark-fill')
+            return MenuItem(label=sheet_id, icon='file-earmark')
 
     return list(map(generate_children, ids))
 
