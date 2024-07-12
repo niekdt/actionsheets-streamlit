@@ -110,7 +110,7 @@ def generate_snippets(data: pl.DataFrame):
         pl.col('code').alias('Code'),
         pl.col('details').alias('Details')
     ).with_columns(
-        pl.col('Code').apply(html_code, return_dtype=pl.String)
+        pl.col('Code').map_elements(html_code, return_dtype=pl.String)
     )
 
     st.html(
