@@ -8,22 +8,19 @@ sheets = get_all_sheets()
 
 
 def generate_actionsheets_items(parent: str) -> list[MenuItem]:
-    ids = sheets.ids(parent_id=parent.lower())
+    sheet_info = sheets.sheet_info(id=parent)
+    show_sheet = not sheet_info['sheet_parent'] or sheet_info['description'] or sheets.sheet_view(parent).snippets().height
+    if show_sheet:
+        yield MenuItem(label=parent, icon='journal-code')
 
-    def generate_children(sheet_id: str) -> MenuItem:
-        child_items = generate_actionsheets_items(sheet_id)
-
-        if child_items:
-            sheet_info = sheets.sheet_info(id=sheet_id)
-
-            self_item = MenuItem(label=sheet_id, icon='journal-code')
-            if len(sheet_info['description']) > 0:
-                child_items.insert(0, self_item)
-            return MenuItem(label=sheet_id.upper(), children=child_items)
+    ids = sheets.ids(parent_id=parent.lower(), nested=False)
+    for id in ids:
+        child_ids = sheets.ids(parent_id=id, nested=False)
+        if child_ids:
+            child_items = list(generate_actionsheets_items(id))
+            yield MenuItem(label=id.upper(), children=child_items)
         else:
-            return MenuItem(label=sheet_id, icon='file-earmark-code')
-
-    return list(map(generate_children, ids))
+            yield MenuItem(label=id, icon='file-earmark-code')
 
 
 def get_sheet_title(section: str) -> str:

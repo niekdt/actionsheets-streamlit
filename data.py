@@ -16,10 +16,6 @@ def get_all_sheets() -> Actionsheets:
     return default_sheets()
 
 
-def get_active_sheet_id():
-    return st.session_state.sheet_id
-
-
 def get_sheet_info(sheet_id: str) -> dict:
     return get_all_sheets().sheet_info(sheet_id)
 

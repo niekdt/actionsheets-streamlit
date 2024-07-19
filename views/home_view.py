@@ -32,7 +32,7 @@ def generate_landing_view():
     with metric_grid.container():
         stylable_metric(
             label='Programming languages',
-            value=f'{len(sheets.ids()):,d}',
+            value=f'{len(sheets.ids(nested=False)):,d}',
             icon=r'\e13e',
             background_color='var(--lang-color)'
         )
