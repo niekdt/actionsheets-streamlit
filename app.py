@@ -17,11 +17,13 @@ print('\n== INIT APP ==')
 active_lang: str = 'Python'
 active_sheet_id: str = ''
 active_view: Literal['', 'home', 'sheets', 'sheet', 'snippets'] = 'home'
+static = False
 
 if 'lang' not in st.session_state:
     # new session; set default language
     st.session_state.lang = active_lang
     st.session_state.view = active_view
+    static = True
 else:
     active_lang = st.session_state.lang
     active_view = st.session_state.view
@@ -100,9 +102,14 @@ with st.sidebar:
         query = st.session_state.search_sheet
         print('SEARCH SHEET FOR QUERY: ', query)
         sheet_id = sheets.find_sheet(query=query)
+
         print('RESULT: ', sheet_id)
         st.session_state.sheet_id = sheet_id
-        st.session_state['actionsheets_menu'] = sheet_id
+        st.session_state.view = 'sheet'
+
+        if sheet_id:
+            st.session_state['actionsheets_menu'] = sheet_id
+            st.session_state.search_sheet = ''
 
 
     st.text_input(
@@ -128,7 +135,8 @@ with st.sidebar:
     active_sheet_index = sheet_item_ids.index(active_sheet_id) if \
         active_sheet_id and active_sheet_id in sheet_item_ids else 0
 
-    if st.session_state['actionsheets_menu'] not in sheet_item_ids:
+    if 'actionsheets_menu' in st.session_state and \
+            st.session_state['actionsheets_menu'] not in sheet_item_ids:
         st.session_state['actionsheets_menu'] = sheet_item_ids[0]
 
     # NOTE: sac.menu callback doesn't work
@@ -146,7 +154,7 @@ with st.sidebar:
         format_func=get_sheet_title
     )
 
-    if not active_sheet_id or active_sheet_id != actionsheets_menu:
+    if not static and (not active_sheet_id or active_sheet_id != actionsheets_menu):
         print('SHEET MENU SELECTION: ', actionsheets_menu)
         active_sheet_id = actionsheets_menu
         active_view = 'sheets'
