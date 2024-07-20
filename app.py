@@ -21,17 +21,17 @@ static = False
 
 if 'lang' not in st.session_state:
     # new session; set default language
-    st.session_state.lang = active_lang
-    st.session_state.view = active_view
+    st.session_state['lang'] = active_lang
+    st.session_state['view'] = active_view
     static = True
 else:
-    active_lang = st.session_state.lang
-    active_view = st.session_state.view
+    active_lang = st.session_state['lang']
+    active_view = st.session_state['view']
 
 if 'sheet_id' not in st.session_state:
-    st.session_state.sheet_id = ''
+    st.session_state['sheet_id'] = ''
 else:
-    active_sheet_id = st.session_state.sheet_id
+    active_sheet_id = st.session_state['sheet_id']
 
 print(f'\tView: {active_view}')
 print(f'\tLang: {active_lang}')
@@ -46,7 +46,7 @@ with open(path.join('.streamlit', 'style.css')) as f:
 # Sidebar
 with st.sidebar:
     def on_click_home():
-        st.session_state.view = 'home'
+        st.session_state['view'] = 'home'
 
 
     with stylable_container(
@@ -70,10 +70,10 @@ with st.sidebar:
     def on_select_language():
         lang = st.session_state['lang_select']
         print('CHANGE TO LANGUAGE: ', lang)
-        st.session_state.lang = lang
-        st.session_state.view = 'sheets'
-        st.session_state.sheet_id = ''
-        st.session_state.search_sheet = ''
+        st.session_state['lang'] = lang
+        st.session_state['view'] = 'sheets'
+        st.session_state['sheet_id'] = ''
+        st.session_state['search_sheet'] = ''
 
 
     langs = sorted(sheets.sheets_data.filter(pl.col('sheet_parent') == '')['title'])
@@ -99,17 +99,17 @@ with st.sidebar:
 
 
     def on_search_sheet():
-        query = st.session_state.search_sheet
+        query = st.session_state['search_sheet']
         print('SEARCH SHEET FOR QUERY: ', query)
         sheet_id = sheets.find_sheet(query=query)
 
         print('RESULT: ', sheet_id)
-        st.session_state.sheet_id = sheet_id
-        st.session_state.view = 'sheet'
+        st.session_state['sheet_id'] = sheet_id
+        st.session_state['view'] = 'sheet'
 
         if sheet_id:
             st.session_state['actionsheets_menu'] = sheet_id
-            st.session_state.search_sheet = ''
+            st.session_state['search_sheet'] = ''
 
 
     st.text_input(
@@ -158,8 +158,8 @@ with st.sidebar:
         print('SHEET MENU SELECTION: ', actionsheets_menu)
         active_sheet_id = actionsheets_menu
         active_view = 'sheets'
-        st.session_state.view = 'sheet'
-        st.session_state.sheet_id = active_sheet_id
+        st.session_state['view'] = 'sheet'
+        st.session_state['sheet_id'] = active_sheet_id
 
 if active_view:
     if active_view == 'home':
