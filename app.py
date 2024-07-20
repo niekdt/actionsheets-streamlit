@@ -16,7 +16,7 @@ from views.sheet_view import generate_sheet_view
 print('\n== INIT APP ==')
 active_lang: str = 'Python'
 active_sheet_id: str = ''
-active_view: Literal['', 'home', 'sheets', 'sheet', 'snippets'] = 'home'
+active_view: Literal['home', 'sheets', 'sheet', 'snippets', 'search'] = 'home'
 static = False
 
 if 'lang' not in st.session_state:
@@ -104,13 +104,14 @@ with st.sidebar:
         sheet_id = sheets.find_sheet(query=query)
 
         print('RESULT: ', sheet_id)
-        st.session_state['sheet_id'] = sheet_id
         st.session_state['view'] = 'sheet'
 
         if sheet_id:
+            st.session_state['sheet_id'] = sheet_id
             st.session_state['actionsheets_menu'] = sheet_id
             st.session_state['search_sheet'] = ''
-
+        else:
+            st.session_state['view'] = 'search'
 
     st.text_input(
         key='search_sheet',
@@ -169,6 +170,8 @@ if active_view:
             generate_sheet_view(active_sheet_id)
         else:
             sac.result(label=f'Sheet "{active_sheet_id}" is undefined', status='error')
+    elif active_view == 'search':
+        sac.result(label=f'No results for query "{st.session_state["search_sheet"]}', status='error')
     else:
         sac.result(label=f'undefined view: {active_view}', status='error')
 else:
