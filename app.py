@@ -17,7 +17,7 @@ print('\n== INIT APP ==')
 active_lang: str = 'Python'
 active_sheet_id: str = ''
 active_view: Literal['home', 'sheets', 'sheet', 'snippets', 'search'] = 'home'
-static = False
+static = st.session_state['static'] if 'static' in st.session_state else False
 
 if 'lang' not in st.session_state:
     # new session; set default language
@@ -105,6 +105,7 @@ with st.sidebar:
 
         print('RESULT: ', sheet_id)
         st.session_state['view'] = 'sheet'
+        st.session_state['static'] = True
 
         if sheet_id:
             st.session_state['sheet_id'] = sheet_id
@@ -223,3 +224,5 @@ with (st.sidebar):
         size='xs',
         indent=10
     )
+
+st.session_state['static'] = False
