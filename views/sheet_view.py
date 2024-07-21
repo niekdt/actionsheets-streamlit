@@ -106,7 +106,7 @@ def generate_snippets(data: pl.DataFrame):
         return highlight(code, lexer, formatter)
 
     pretty_data = data.select(
-        pl.col('title').alias('What'),
+        pl.col('title').alias('Action'),
         pl.col('code').alias('Code'),
         pl.col('details').alias('Details')
     ).with_columns(
