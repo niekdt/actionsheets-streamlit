@@ -50,7 +50,7 @@ def generate_landing_view():
     with metric_grid.container():
         stylable_metric(
             label='Code snippets',
-            value=f'{all_sheets.snippets_data.height:,d}',
+            value=f'{all_sheets.count_snippets():,d}',
             icon=r'\e86f',
             background_color='var(--section-color)'
         )
