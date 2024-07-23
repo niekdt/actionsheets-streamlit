@@ -11,12 +11,16 @@ from streamlit_extras.stylable_container import stylable_container
 from data import get_all_sheets
 from sidebar import generate_actionsheets_items, sheet_toc, get_sheet_title
 from views.home_view import generate_landing_view
-from views.sheet_view import generate_sheet_view
+from views.sheet_view import generate_sheet_view, generate_filtered_sheet_view
 
 print('\n== INIT APP ==')
 active_lang: str = 'Python'
 active_sheet_id: str = ''
-active_view: Literal['home', 'sheets', 'sheet', 'snippets', 'search'] = 'home'
+active_view: Literal[
+    'home',
+    'sheets', 'sheets_result',
+    'sheet', 'sheet_result',
+] = 'home'
 static = st.session_state['static'] if 'static' in st.session_state else False
 
 if 'lang' not in st.session_state:
@@ -28,10 +32,10 @@ else:
     active_lang = st.session_state['lang']
     active_view = st.session_state['view']
 
-if 'sheet_id' not in st.session_state:
-    st.session_state['sheet_id'] = ''
+if 'sheet' not in st.session_state:
+    st.session_state['sheet'] = ''
 else:
-    active_sheet_id = st.session_state['sheet_id']
+    active_sheet_id = st.session_state['sheet']
 
 print(f'\tView: {active_view}')
 print(f'\tLang: {active_lang}')
@@ -72,7 +76,7 @@ with st.sidebar:
         print('CHANGE TO LANGUAGE: ', lang)
         st.session_state['lang'] = lang
         st.session_state['view'] = 'sheets'
-        st.session_state['sheet_id'] = ''
+        st.session_state['sheet'] = ''
         st.session_state['search_sheet'] = ''
 
 
@@ -95,7 +99,7 @@ with st.sidebar:
         disabled=True
     )
 
-    sac.divider(f'{active_lang} actionsheets', color='green', size='lg')
+    sac.divider(label='Actionsheets', color='green', size='lg')
 
 
     def on_search_sheet():
@@ -108,11 +112,11 @@ with st.sidebar:
         st.session_state['static'] = True
 
         if sheet_id:
-            st.session_state['sheet_id'] = sheet_id
+            st.session_state['sheet'] = sheet_id
             st.session_state['actionsheets_menu'] = sheet_id
             st.session_state['search_sheet'] = ''
         else:
-            st.session_state['view'] = 'search'
+            st.session_state['view'] = 'sheets_result'
 
     st.text_input(
         key='search_sheet',
@@ -124,7 +128,6 @@ with st.sidebar:
 
     sheet_items = list(generate_actionsheets_items(active_lang.lower()))
 
-
     def get_menu_ids(items: list[MenuItem]) -> list[str]:
         for item in items:
             yield item.label
@@ -133,7 +136,6 @@ with st.sidebar:
 
 
     sheet_item_ids = list(get_menu_ids(sheet_items))
-
     active_sheet_index = sheet_item_ids.index(active_sheet_id) if \
         active_sheet_id and active_sheet_id in sheet_item_ids else 0
 
@@ -159,45 +161,42 @@ with st.sidebar:
     if not static and (not active_sheet_id or active_sheet_id != actionsheets_menu):
         print('SHEET MENU SELECTION: ', actionsheets_menu)
         active_sheet_id = actionsheets_menu
-        active_view = 'sheets'
+        active_view = 'sheet'
         st.session_state['view'] = 'sheet'
-        st.session_state['sheet_id'] = active_sheet_id
+        st.session_state['sheet'] = active_sheet_id
 
-if active_view:
-    if active_view == 'home':
-        generate_landing_view()
-    elif active_view == 'sheets' or active_view == 'sheet':
-        if sheets.has_sheet(active_sheet_id):
-            generate_sheet_view(active_sheet_id)
-        else:
-            sac.result(label=f'Sheet "{active_sheet_id}" is undefined', status='error')
-    elif active_view == 'search':
-        sac.result(label=f'No results for query "{st.session_state["search_sheet"]}', status='error')
-    else:
-        sac.result(label=f'undefined view: {active_view}', status='error')
-else:
-    sac.result(label=f'no defined view', status='error')
+has_sheet = sheets.has_sheet(active_sheet_id)
 
 with (st.sidebar):
-    sheet_name = sheets.sheet_info(active_sheet_id)['title'] if \
-        sheets.has_sheet(active_sheet_id) else ''
+    sac.divider(label='Actionsheet sections', color='yellow', size='md')
 
-    sac.divider(
-        f'{sheet_name} sections' if sheet_name else 'Sections',
-        color='yellow',
-        size='md'
-    )
+    def on_search_snippet():
+        print('SEARCH SNIPPET')
+        query = st.session_state['search_snippet']
+
+        active_sheet = sheets.sheet_view(active_sheet_id)
+        snippets = active_sheet.find_snippets(query=query)['entry'].to_list()
+
+        if snippets:
+            search_view = active_sheet.filter_view(snippets)
+
+            st.session_state['view'] = 'sheet_result'
+            st.session_state['search_snippet'] = ''
+            st.session_state['filtered_sheet_data'] = search_view
+
 
     st.text_input(
-        label='Search snippet',
+        key='search_snippet',
+        label='Search snippets',
         placeholder='Search snippet',
         label_visibility='collapsed',
-        disabled=True
+        disabled=not has_sheet,
+        on_change=on_search_snippet
     )
 
     if sheets.has_sheet(active_sheet_id):
         sheet_toc(
-            sheet=sheets.sheet_view(id=active_sheet_id),
+            sheet=sheets.sheet_view(active_sheet_id),
             parent_section=''
         )
 
@@ -224,5 +223,26 @@ with (st.sidebar):
         size='xs',
         indent=10
     )
+
+if active_view:
+    if active_view == 'home':
+        generate_landing_view()
+    elif active_view == 'sheet':
+        if has_sheet:
+            generate_sheet_view()
+        else:
+            sac.result(label=f'Sheet "{active_sheet_id}" is undefined', status='error')
+    elif active_view == 'sheet_result':
+        if has_sheet:
+            generate_filtered_sheet_view()
+        else:
+            sac.result(label=f'Sheet "{active_sheet_id}" is undefined', status='error')
+    elif active_view == 'sheets_result':
+        sac.result(label=f'No results for query "{st.session_state["search_sheet"]}', status='error')
+    else:
+        sac.result(label=f'undefined view: {active_view}', status='error')
+else:
+    sac.result(label=f'no defined view', status='error')
+
 
 st.session_state['static'] = False

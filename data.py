@@ -16,9 +16,9 @@ def get_all_sheets() -> Actionsheets:
     return default_sheets()
 
 
-def get_sheet_info(sheet_id: str) -> dict:
-    return get_all_sheets().sheet_info(sheet_id)
+def get_sheet_info(sheet: str) -> dict:
+    return get_all_sheets().sheet_info(sheet)
 
 
-def get_sheet(sheet_id: str) -> ActionsheetView:
-    return get_all_sheets().sheet_view(sheet_id)
+def get_sheet(sheet: str) -> ActionsheetView:
+    return get_all_sheets().sheet_view(sheet)

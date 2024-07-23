@@ -8,16 +8,18 @@ from data import get_all_sheets
 
 
 def generate_landing_view():
-    sheets = get_all_sheets()
+    all_sheets = get_all_sheets()
 
     st.title('Actionsheets')
 
     all_langs = sorted(['Julia', 'Python', 'R', 'MATLAB', 'Stan'])
-    langs = sheets.sheets_data.filter(pl.col('sheet_parent') == '')['title']
+    langs = all_sheets.sheets_data.filter(pl.col('sheet_parent') == '')['title']
 
     sac.segmented(
         key='lang_segmented',
-        items=[sac.SegmentedItem(label=lang, disabled=lang not in langs) for lang in all_langs],
+        items=[
+            sac.SegmentedItem(label=lang, disabled=lang not in langs) for lang in all_langs
+        ],
         label='',
         align='start',
         color='blue',
@@ -32,7 +34,7 @@ def generate_landing_view():
     with metric_grid.container():
         stylable_metric(
             label='Programming languages',
-            value=f'{len(sheets.ids(nested=False)):,d}',
+            value=f'{len(all_sheets.sheets(nested=False)):,d}',
             icon=r'\e13e',
             background_color='var(--lang-color)'
         )
@@ -40,7 +42,7 @@ def generate_landing_view():
     with metric_grid.container():
         stylable_metric(
             label='Actionsheets',
-            value=f'{sheets.sheets_data.height:,d}',
+            value=f'{all_sheets.sheets_data.height:,d}',
             icon=r'\F388',
             background_color='var(--sheet-color)'
         )
@@ -48,7 +50,7 @@ def generate_landing_view():
     with metric_grid.container():
         stylable_metric(
             label='Code snippets',
-            value=f'{sheets.snippets_data.height:,d}',
+            value=f'{all_sheets.snippets_data.height:,d}',
             icon=r'\e86f',
             background_color='var(--section-color)'
         )

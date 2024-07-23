@@ -4,18 +4,20 @@ from streamlit_antd_components import MenuItem
 
 from data import get_all_sheets
 
-sheets = get_all_sheets()
+all_sheets = get_all_sheets()
 
 
 def generate_actionsheets_items(parent: str) -> list[MenuItem]:
-    sheet_info = sheets.sheet_info(id=parent)
-    show_sheet = not sheet_info['sheet_parent'] or sheet_info['description'] or sheets.sheet_view(parent).snippets().height
+    sheet_info = all_sheets.sheet_info(sheet=parent)
+    show_sheet = (not sheet_info['sheet_parent']
+                  or sheet_info['description']
+                  or all_sheets.sheet_view(parent).snippets().height)
     if show_sheet:
         yield MenuItem(label=parent, icon='journal-code')
 
-    ids = sheets.ids(parent_id=parent.lower(), nested=False)
+    ids = all_sheets.sheets(parent=parent.lower(), nested=False)
     for id in ids:
-        child_ids = sheets.ids(parent_id=id, nested=False)
+        child_ids = all_sheets.sheets(parent=id, nested=False)
         if child_ids:
             child_items = list(generate_actionsheets_items(id))
             yield MenuItem(label=id.upper(), children=child_items)
@@ -25,7 +27,7 @@ def generate_actionsheets_items(parent: str) -> list[MenuItem]:
 
 def get_sheet_title(section: str) -> str:
     if section:
-        return sheets.sheet_info(id=section.lower())['title']
+        return all_sheets.sheet_info(sheet=section.lower())['title']
     else:
         return ''
 
@@ -36,8 +38,8 @@ def sheet_toc(sheet: ActionsheetView, parent_section: str):
     st.html(f'<ul class="toc">{html_content}</ul>')
 
 
-def generate_sections_list_html(sheet, parent_section: str) -> str:
-    ids = sheet.child_ids(type='section', section=parent_section)
+def generate_sections_list_html(sheet: ActionsheetView, parent_section: str) -> str:
+    ids = sheet.entries(type='section', parent=parent_section, nested=False)
 
     def generate_section_entry(section: str):
         info = sheet.section_info(section)
