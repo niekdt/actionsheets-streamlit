@@ -96,7 +96,7 @@ with st.sidebar:
     def on_quicksearch():
         query = st.session_state['quick_search']
         print('QUICK SEARCH query: ', query)
-        search_results = sheets.find_snippets(query)
+        search_results = sheets.filter(active_lang.lower()).find_snippets(query)
 
         st.session_state['view'] = 'sheets_result'
 
@@ -121,7 +121,7 @@ with st.sidebar:
     def on_search_sheet():
         query = st.session_state['search_sheet']
         print('SEARCH SHEET FOR QUERY: ', query)
-        sheet_id = sheets.find_sheet(query=query)
+        sheet_id = sheets.filter(active_lang.lower()).find_sheet(query=query)
 
         print('RESULT: ', sheet_id)
         st.session_state['view'] = 'sheet'
@@ -228,7 +228,7 @@ with (st.sidebar):
                 icon='question-circle',
                 href='https://github.com/niekdt/actionsheets/issues'
             ),
-            sac.MenuItem('Streamlit website', disabled=True),
+            sac.MenuItem('Streamlit actionsheets app', disabled=True),
             sac.MenuItem('Github', icon='github',
                          href='https://github.com/niekdt/actionsheets-streamlit'),
             sac.MenuItem(
