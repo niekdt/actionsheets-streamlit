@@ -12,6 +12,7 @@ from data import get_all_sheets
 from sidebar import generate_actionsheets_items, sheet_toc, get_sheet_title
 from views.home_view import generate_landing_view
 from views.sheet_view import generate_sheet_view, generate_filtered_sheet_view
+from views.sheets_view import generate_sheets_results
 
 print('\n== INIT APP ==')
 active_lang: str = 'Python'
@@ -92,11 +93,26 @@ with st.sidebar:
     )
 
 with st.sidebar:
+    def on_quicksearch():
+        query = st.session_state['quick_search']
+        print('QUICK SEARCH query: ', query)
+        search_results = sheets.find_snippets(query)
+
+        st.session_state['view'] = 'sheets_result'
+
+        if search_results.count_snippets() > 0:
+            st.session_state['quick_search'] = ''
+            st.session_state['filtered_sheets_data'] = search_results
+        else:
+            del st.session_state['filtered_sheets_data']
+
+
     st.text_input(
+        key='quick_search',
         label='Search all',
         placeholder='Quick snippet search',
         label_visibility='collapsed',
-        disabled=True
+        on_change=on_quicksearch
     )
 
     sac.divider(label='Actionsheets', color='green', size='lg')
@@ -183,6 +199,8 @@ with (st.sidebar):
             st.session_state['view'] = 'sheet_result'
             st.session_state['search_snippet'] = ''
             st.session_state['filtered_sheet_data'] = search_view
+        else:
+            del st.session_state['filtered_sheet_data']
 
 
     st.text_input(
@@ -238,7 +256,7 @@ if active_view:
         else:
             sac.result(label=f'Sheet "{active_sheet_id}" is undefined', status='error')
     elif active_view == 'sheets_result':
-        sac.result(label=f'No results for query "{st.session_state["search_sheet"]}', status='error')
+        generate_sheets_results()
     else:
         sac.result(label=f'undefined view: {active_view}', status='error')
 else:
