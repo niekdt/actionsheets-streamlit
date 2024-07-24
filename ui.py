@@ -6,8 +6,7 @@ from streamlit_extras.stylable_container import stylable_container
 def stylable_metric(
         label: str,
         value: str | int | float,
-        background_color: str,
-        icon: str = ''
+        background_color: str
 ) -> DeltaGenerator:
     component = stylable_container(
             key=label.replace(' ', ''),

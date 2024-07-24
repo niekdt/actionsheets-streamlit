@@ -35,7 +35,6 @@ def generate_landing_view():
         stylable_metric(
             label='Programming languages',
             value=f'{len(all_sheets.sheets(nested=False)):,d}',
-            icon=r'\e13e',
             background_color='var(--lang-color)'
         )
 
@@ -43,7 +42,6 @@ def generate_landing_view():
         stylable_metric(
             label='Actionsheets',
             value=f'{all_sheets.sheets_data.height:,d}',
-            icon=r'\F388',
             background_color='var(--sheet-color)'
         )
 
@@ -51,7 +49,6 @@ def generate_landing_view():
         stylable_metric(
             label='Code snippets',
             value=f'{all_sheets.count_snippets():,d}',
-            icon=r'\e86f',
             background_color='var(--section-color)'
         )
 
