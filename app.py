@@ -201,7 +201,7 @@ with (st.sidebar):
         snippets = active_sheet.find_snippets(query=query)['entry'].to_list()
 
         if snippets:
-            search_view = active_sheet.filter_view(snippets)
+            search_view = active_sheet.filter(snippets)
 
             st.session_state['view'] = 'sheet_result'
             st.session_state['search_snippet'] = ''
