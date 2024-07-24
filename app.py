@@ -14,6 +14,13 @@ from views.home_view import generate_landing_view
 from views.sheet_view import generate_sheet_view, generate_filtered_sheet_view
 from views.sheets_view import generate_sheets_results
 
+st.set_page_config(
+    page_title='Actionsheets',
+    page_icon='📄',
+    initial_sidebar_state='expanded',
+    layout='wide'
+)
+
 print('\n== INIT APP ==')
 active_lang: str = 'Python'
 active_sheet_id: str = ''
