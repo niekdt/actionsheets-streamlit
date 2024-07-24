@@ -2,11 +2,11 @@ from os import path
 from typing import Literal
 
 import streamlit as st
-
 import polars as pl
 import streamlit_antd_components as sac
 from streamlit_antd_components import MenuItem
 from streamlit_extras.stylable_container import stylable_container
+from importlib.metadata import version
 
 from data import get_all_sheets
 from sidebar import generate_actionsheets_items, sheet_toc, get_sheet_title
@@ -228,7 +228,14 @@ with (st.sidebar):
     sac.menu(
         items=[
             sac.MenuItem(type='divider'),
-            sac.MenuItem('Actionsheets package', disabled=True),
+            sac.MenuItem(
+                label='Actionsheets package',
+                disabled=True,
+                tag=sac.Tag(
+                    label=f'v{version("actionsheets")}',
+                    link=f'https://github.com/niekdt/actionsheets/releases/tag/v{version("actionsheets")}'
+                ),
+            ),
             sac.MenuItem('Github', icon='github', href='https://github.com/niekdt/actionsheets'),
             sac.MenuItem(
                 label='Submit an issue / snippet',
