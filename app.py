@@ -67,6 +67,7 @@ with st.sidebar:
                 'div {float: left; width: 100%; text-align: left;}',
                 'button {border-style: none; background-color: transparent; float:left;}',
                 'button:hover {color: inherit}',
+                'button:focus {color: inherit}',
                 'p {font-size: 24pt; font-weight: bold;}'
             ]
     ):
