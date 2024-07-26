@@ -12,7 +12,7 @@ def generate_landing_view():
 
     st.title('Actionsheets')
 
-    all_langs = sorted(['Julia', 'Python', 'R', 'MATLAB', 'Stan'])
+    all_langs = sorted(['Python', 'R', 'Stan'])
     langs = all_sheets.sheets_data.filter(pl.col('sheet_parent') == '')['title']
 
     sac.segmented(
@@ -101,23 +101,3 @@ def generate_landing_view():
     - With the increasing usage of LLMs, the problem of bloated low-quality answer results will only get worse.
      
     ''')
-
-    # sac.tabs([
-    #     sac.TabsItem(label='Create', tag="10"),
-    #     sac.TabsItem(label='Test'),
-    #     sac.TabsItem(label='Extract', icon='github'),
-    #     sac.TabsItem(label='Update'),
-    #     sac.TabsItem(label='Derive'),
-    #     sac.TabsItem(label='Convert'),
-    # ], position='right', variant='outline', use_container_width=True, return_index=True)
-
-    # card(
-    #     title="datetime",
-    #     text="Some description",
-    #     styles={"card": {"background-color": "blue"}},
-    # )
-    # card(
-    #     title="str",
-    #     text="Some description",
-    #     styles={"card": {"background-color": "tomato"}},
-    # )
