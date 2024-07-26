@@ -8,11 +8,15 @@
 
 /* hide top bar */
 header[data-testid="stHeader"] {
-    height: 0px
+    height: 0px;
 }
 
 div [data-testid="stSidebarHeader"] {
-    display: none;
+    height: 0px;
+    position: absolute;
+    z-index: 2;
+    top: 10px;
+    left: 200px;
 }
 
 /* reduce page margins */
