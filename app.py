@@ -13,6 +13,7 @@ from sidebar import generate_actionsheets_items, sheet_toc, get_sheet_title
 from views.home_view import generate_landing_view
 from views.sheet_view import generate_sheet_view, generate_filtered_sheet_view
 from views.sheets_view import generate_sheets_results
+from views.structure_view import generate_structure_view
 
 st.set_page_config(
     page_title='Actionsheets',
@@ -60,6 +61,9 @@ with st.sidebar:
     def on_click_home():
         st.session_state['view'] = 'home'
 
+    def on_click_struct():
+        st.session_state['view'] = 'struct'
+
 
     with stylable_container(
             key='home',
@@ -76,6 +80,30 @@ with st.sidebar:
             use_container_width=True,
             on_click=on_click_home
         )
+
+    with stylable_container(
+            key='nav',
+            css_styles=[
+                'div {float: left; width: 100%; text-align: left; gap: 0;}',
+                'button {border-style: none; background-color: transparent; float:left;}',
+                'button:hover {background-color: gray; color: inherit;}',
+                'button:focus {background-color: gray; color: inherit}'
+            ]
+    ):
+        with st.container():
+            st.button(
+                key='home_nav',
+                label='🏠 Home',
+                on_click=on_click_home,
+                use_container_width=True
+            )
+
+            st.button(
+                key='struc_nav',
+                label='📄 Sheet structure',
+                on_click=on_click_struct,
+                use_container_width=True
+            )
 
     sac.divider('Programming language', color='blue', size='xl')
 
@@ -142,6 +170,7 @@ with st.sidebar:
         else:
             st.session_state['view'] = 'sheets_result'
 
+
     st.text_input(
         key='search_sheet',
         label='Search sheet',
@@ -151,6 +180,7 @@ with st.sidebar:
     )
 
     sheet_items = list(generate_actionsheets_items(active_lang.lower()))
+
 
     def get_menu_ids(items: list[MenuItem]) -> list[str]:
         for item in items:
@@ -193,6 +223,7 @@ has_sheet = sheets.has_sheet(active_sheet_id)
 
 with (st.sidebar):
     sac.divider(label='Actionsheet sections', color='yellow', size='md')
+
 
     def on_search_snippet():
         print('SEARCH SNIPPET')
@@ -260,6 +291,8 @@ with (st.sidebar):
 if active_view:
     if active_view == 'home':
         generate_landing_view()
+    elif active_view == 'struct':
+        generate_structure_view()
     elif active_view == 'sheet':
         if has_sheet:
             generate_sheet_view()
@@ -276,6 +309,5 @@ if active_view:
         sac.result(label=f'undefined view: {active_view}', status='error')
 else:
     sac.result(label=f'no defined view', status='error')
-
 
 st.session_state['static'] = False
