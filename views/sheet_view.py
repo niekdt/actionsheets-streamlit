@@ -8,10 +8,11 @@ from pygments.lexers import get_lexer_by_name
 from streamlit_extras.row import row
 from streamlit_extras.stylable_container import stylable_container
 
-from data import get_sheet_info, get_sheet
+from data import get_sheet_info, get_sheet, get_all_sheets
 from sidebar import sheet_toc
 
 formatter = HtmlFormatter(style='monokai', linenos=False)
+lexers = {}
 
 
 def generate_sheet_view():
@@ -43,6 +44,10 @@ def generate_filtered_sheet_view():
 
 def _init():
     st.html('<style>' + formatter.get_style_defs('.highlight') + '</style>')
+    sheets = get_all_sheets()
+    languages = sheets.snippets_data['language'].unique().to_list()
+    global lexers
+    lexers = {lang: get_lexer_by_name(lang) for lang in languages}
 
 
 def _generate_sheet_header(sheet_data: ActionsheetView):
@@ -126,17 +131,18 @@ def _generate_section_snippets(view: ActionsheetView, section: str):
 def _generate_snippets(data: pl.DataFrame):
     assert data.height > 0
 
-    lexer = get_lexer_by_name('Python')
+    def html_code(x) -> str:
+        return highlight(x['code'], lexers[x['language']], formatter)
 
-    def html_code(code) -> str:
-        return highlight(code, lexer, formatter)
-
-    pretty_data = data.select(
+    pretty_data = data.with_columns(
+        pl.struct(['code', 'language']).map_elements(
+            html_code,
+            return_dtype=pl.String
+        ).alias('code')
+    ).select(
         pl.col('title').alias('Action'),
         pl.col('code').alias('Code'),
         pl.col('details').alias('Details')
-    ).with_columns(
-        pl.col('Code').map_elements(html_code, return_dtype=pl.String)
     )
 
     st.html(
