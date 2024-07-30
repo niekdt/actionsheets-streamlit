@@ -31,6 +31,7 @@ active_view: Literal[
     'sheet', 'sheet_result',
 ] = 'home'
 static = st.session_state['static'] if 'static' in st.session_state else False
+print('STATIC: ', static)
 
 if 'lang' not in st.session_state:
     # new session; set default language
@@ -60,9 +61,11 @@ with open(path.join('.streamlit', 'style.css')) as f:
 with st.sidebar:
     def on_click_home():
         st.session_state['view'] = 'home'
+        st.session_state['static'] = True
 
     def on_click_struct():
         st.session_state['view'] = 'struct'
+        st.session_state['static'] = True
 
 
     with stylable_container(
@@ -195,7 +198,16 @@ with st.sidebar:
 
     if 'actionsheets_menu' in st.session_state and \
             st.session_state['actionsheets_menu'] not in sheet_item_ids:
-        st.session_state['actionsheets_menu'] = sheet_item_ids[0]
+        if not static:
+            # change view to first sheet, as if user clicked first item
+            active_sheet_id = sheet_item_ids[0]
+            active_view = 'sheet'
+            st.session_state['view'] = 'sheet'
+            st.session_state['sheet'] = active_sheet_id
+        # Don't update from None because this triggers rerun while in another view
+        if st.session_state['actionsheets_menu'] is not None:
+            st.session_state['actionsheets_menu'] = sheet_item_ids[0]  # this triggers a rerun
+        static = True  # prevent sac.menu selection change from triggering upon rerun
 
     # NOTE: sac.menu callback doesn't work
     # NOTE: an item must be selected, otherwise the component does not expand correctly
@@ -204,7 +216,7 @@ with st.sidebar:
     actionsheets_menu = sac.menu(
         key='actionsheets_menu',
         items=sheet_items,
-        index=0,
+        index=-1,
         indent=10,
         open_all=False,
         size='sm',
