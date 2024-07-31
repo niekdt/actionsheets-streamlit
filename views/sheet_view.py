@@ -10,6 +10,7 @@ from streamlit_extras.stylable_container import stylable_container
 
 from data import get_sheet_info, get_sheet, get_all_sheets
 from sidebar import sheet_toc
+from ui import inline_markdown_html
 
 formatter = HtmlFormatter(style='monokai', linenos=False)
 lexers = {}
@@ -140,9 +141,9 @@ def _generate_snippets(data: pl.DataFrame):
             return_dtype=pl.String
         ).alias('code')
     ).select(
-        pl.col('title').alias('Action'),
+        pl.col('title').alias('Action').map_elements(inline_markdown_html),
         pl.col('code').alias('Code'),
-        pl.col('details').alias('Details')
+        pl.col('details').alias('Details').map_elements(inline_markdown_html)
     )
 
     st.html(
