@@ -15,9 +15,14 @@ streamlit run app.py
 ```
 
 ## Development
-To install the latest version of the actionsheets package, run:
+This project uses Poetry to manage dependencies. To install the dependencies, run:
+```shell
+poetry install
+```
+
+To update dependencies, run:
 
 ```shell
-pip install git+https://github.com/niekdt/actionsheets.git  
-pip freeze > requirements.txt
+poetry update
+poetry export --without-hashes -f requirements.txt > requirements.txt
 ```

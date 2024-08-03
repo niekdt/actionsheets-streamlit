@@ -1,0 +1,21 @@
+[tool.poetry]
+name = "actionsheets-streamlit"
+package-mode = false
+authors = ["Niek Den Teuling <niekdt@users.noreply.github.com>"]
+license = "MIT"
+readme = "README.md"
+homepage = "https://actionsheets.streamlit.app/"
+repository = "https://github.com/niekdt/actionsheets-streamlit"
+
+[tool.poetry.dependencies]
+python = "^3.11"
+streamlit = "^1.37.0"
+streamlit-extras = "^0.4.3"
+streamlit-antd-components = "^0.3.2"
+actionsheets = {git = "https://github.com/niekdt/actionsheets.git"}
+tabulate = "^0.9.0"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
