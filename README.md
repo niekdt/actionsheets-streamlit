@@ -24,5 +24,4 @@ To update dependencies, run:
 
 ```shell
 poetry update
-poetry export --without-hashes -f requirements.txt > requirements.txt
 ```
