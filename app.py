@@ -4,12 +4,11 @@ from typing import Literal
 import streamlit as st
 import polars as pl
 import streamlit_antd_components as sac
-from streamlit_antd_components import MenuItem
 from streamlit_extras.stylable_container import stylable_container
 from importlib.metadata import version
 
 from data import get_all_sheets
-from sidebar import generate_actionsheets_items, sheet_toc, get_sheet_title
+from sidebar import sheet_toc
 from views.home_view import generate_landing_view
 from views.sheet_view import generate_sheet_view, generate_filtered_sheet_view
 from views.sheets_view import generate_sheets_results
@@ -115,8 +114,8 @@ with st.sidebar:
         lang = st.session_state['lang_select']
         print('CHANGE TO LANGUAGE: ', lang)
         st.session_state['lang'] = lang
-        st.session_state['view'] = 'sheets'
-        st.session_state['sheet'] = ''
+        st.session_state['view'] = 'sheet'  # TODO: implement "sheets" view
+        st.session_state['sheet'] = lang.lower()
         st.session_state['search_sheet'] = ''
 
 
@@ -182,60 +181,50 @@ with st.sidebar:
         on_change=on_search_sheet
     )
 
-    sheet_items = list(generate_actionsheets_items(active_lang.lower()))
+    sheet_ids: list[str] = sheets.sheets(parent=active_lang.lower(), nested=True)
+    sheets_data = sheets.sheets_data.filter(
+        pl.col('sheet').is_in(sheet_ids)
+    ).sort(by='sheet')
 
-
-    def get_menu_ids(items: list[MenuItem]) -> list[str]:
-        for item in items:
-            yield item.label
-            if item.children:
-                yield from get_menu_ids(item.children)
-
-
-    sheet_item_ids = list(get_menu_ids(sheet_items))
-    active_sheet_index = sheet_item_ids.index(active_sheet_id) if \
-        active_sheet_id and active_sheet_id in sheet_item_ids else 0
-
-    if 'actionsheets_menu' in st.session_state and \
-            st.session_state['actionsheets_menu'] not in sheet_item_ids:
-        if not static:
-            # change view to first sheet, as if user clicked first item
-            active_sheet_id = sheet_item_ids[0]
-            active_view = 'sheet'
-            st.session_state['view'] = 'sheet'
-            st.session_state['sheet'] = active_sheet_id
-        # Don't update from None because this triggers rerun while in another view
-        if st.session_state['actionsheets_menu'] is not None:
-            st.session_state['actionsheets_menu'] = sheet_item_ids[0]  # this triggers a rerun
-        static = True  # prevent sac.menu selection change from triggering upon rerun
-
-    # NOTE: sac.menu callback doesn't work
-    # NOTE: an item must be selected, otherwise the component does not expand correctly
-    # NOTE: changing the index causes complete reloading of the component, so use sparingly!
-    # NOTE: don't use st.rerun(), as it causes random reload/selection issues
-    actionsheets_menu = sac.menu(
-        key='actionsheets_menu',
-        items=sheet_items,
-        index=-1,
-        indent=10,
-        open_all=False,
-        size='sm',
-        color='green',
-        format_func=get_sheet_title
-    )
-
-    if not static and (not active_sheet_id or active_sheet_id != actionsheets_menu):
-        print('SHEET MENU SELECTION: ', actionsheets_menu)
-        active_sheet_id = actionsheets_menu
-        active_view = 'sheet'
+    def on_select_sheet(id: str):
+        print('OPEN SHEET: ', id)
         st.session_state['view'] = 'sheet'
-        st.session_state['sheet'] = active_sheet_id
+        st.session_state['sheet'] = id
+
+    with stylable_container(
+            key='sheets_menu',
+            css_styles=[
+                'div {float: left; width: 100%; text-align: left; gap: 0;}',
+                '''button {
+                    border-style: none; 
+                    background-color: transparent; 
+                    color: var(--sheet-color); 
+                    float:left; 
+                    min-height: 0; 
+                    padding: 0; 
+                    margin: -2px; 
+                    padding-left: 5px;
+                }''',
+                'button:hover {background-color: gray; color: inherit;}',
+                'button:focus {background-color: gray; color: inherit}'
+            ]
+    ):
+        with st.container():
+            for sheet, title, depth in zip(
+                    sheets_data['sheet'], sheets_data['title'], sheets_data['depth']
+            ):
+                st.button(
+                    key=f'sheet_{sheet}',
+                    label='&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;' * (depth - 1) + ('▫️' if depth > 0 else '') + title,
+                    use_container_width=True,
+                    on_click=on_select_sheet,
+                    args=(sheet,)
+                )
 
 has_sheet = sheets.has_sheet(active_sheet_id)
 
-with (st.sidebar):
+with st.sidebar:
     sac.divider(label='Actionsheet sections', color='yellow', size='md')
-
 
     def on_search_snippet():
         print('SEARCH SNIPPET')
