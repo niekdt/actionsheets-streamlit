@@ -141,9 +141,15 @@ def _generate_snippets(data: pl.DataFrame):
             return_dtype=pl.String
         ).alias('code')
     ).select(
-        pl.col('title').alias('Action').map_elements(inline_markdown_html),
+        pl.col('title').alias('Action').map_elements(
+            inline_markdown_html,
+            return_dtype=pl.String
+        ),
         pl.col('code').alias('Code'),
-        pl.col('details').alias('Details').map_elements(inline_markdown_html)
+        pl.col('details').alias('Details').map_elements(
+            inline_markdown_html,
+            return_dtype=pl.String
+        )
     )
 
     st.html(
