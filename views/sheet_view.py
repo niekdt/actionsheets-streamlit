@@ -136,21 +136,30 @@ def _generate_snippets(data: pl.DataFrame):
         return highlight(x['code'], lexers[x['language']], formatter)
 
     pretty_data = data.with_columns(
-        pl.struct(['code', 'language']).map_elements(
+        code=pl.struct(['code', 'language']).map_elements(
             html_code,
             return_dtype=pl.String
-        ).alias('code')
-    ).select(
-        pl.col('title').alias('Action').map_elements(
+        )
+    ).with_columns(
+        Action=pl.col('title').map_elements(
             inline_markdown_html,
             return_dtype=pl.String
         ),
-        pl.col('code').alias('Code'),
-        pl.col('details').alias('Details').map_elements(
+        Code=pl.col('code').alias('Code'),
+        Details=pl.col('details').map_elements(
             inline_markdown_html,
             return_dtype=pl.String
         )
-    )
+    ).with_columns(
+        Details=pl.when(pl.col('source').is_not_null()).then(
+            pl.concat_str(
+                pl.col('Details'),
+                pl.lit('<a href="'),
+                pl.col('source'),
+                pl.lit('" target="_blank">📜Source</a>')  # target seems to be ignored?
+            )
+        )
+    ).select(pl.col(['Action', 'Code', 'Details']))
 
     st.html(
         pretty_data.to_pandas().to_markdown(index=False, tablefmt='unsafehtml')
