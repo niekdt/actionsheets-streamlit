@@ -94,6 +94,10 @@ def _generate_sheet_header(sheet_data: ActionsheetView):
             st.html('<h4 class="sheet">Details</h4>')
             st.markdown(sheet_info['details'])
 
+        if 'code' in sheet_info and sheet_info['code']:
+            st.html('<h4 class="sheet">Code</h4>')
+            st.html(highlight(sheet_info['code'], lexers[sheet_info['language']], formatter))
+
     with sheet_info_row.container():
         st.html('<h4 class="sheet">Sections</h4>')
         sheet_toc(
