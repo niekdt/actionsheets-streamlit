@@ -142,7 +142,9 @@ with st.sidebar:
             st.session_state['quick_search'] = ''
             st.session_state['filtered_sheets_data'] = search_results
         else:
-            del st.session_state['filtered_sheets_data']
+            st.warning('No sheets found')
+            if 'filtered_sheets_data' not in st.session_state:
+                del st.session_state['filtered_sheets_data']
 
 
     st.text_input(
@@ -240,7 +242,9 @@ with st.sidebar:
             st.session_state['search_snippet'] = ''
             st.session_state['filtered_sheet_data'] = search_view
         else:
-            del st.session_state['filtered_sheet_data']
+            st.warning('No snippets found')
+            if 'filtered_sheet_data' not in st.session_state:
+                del st.session_state['filtered_sheet_data']
 
 
     st.text_input(
