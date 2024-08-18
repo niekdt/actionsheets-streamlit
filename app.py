@@ -1,3 +1,4 @@
+import itertools
 from os import path
 from typing import Literal
 
@@ -183,10 +184,26 @@ with st.sidebar:
         on_change=on_search_sheet
     )
 
-    sheet_ids: list[str] = sheets.sheets(parent=active_lang.lower(), nested=True)
-    sheets_data = sheets.sheets_data.filter(
-        pl.col('sheet').is_in(sheet_ids)
-    ).sort(by='sheet')
+    def get_child_sheets(id: str) -> list[str]:
+        return sheets.sheets_data.filter(
+            pl.col('sheet_parent') == id
+        ).sort('rank')['sheet'].to_list()
+
+    def get_nested_child_sheets(id: str) -> list[str]:
+        # get children in sorted order
+        child_ids = get_child_sheets(id)
+
+        ids = list()
+        ids.append(id)
+        for child_id in child_ids:
+            ids += get_nested_child_sheets(child_id)
+        return ids
+
+    sheet_ids = get_nested_child_sheets(active_lang.lower())
+
+    df_sheet = pl.DataFrame(pl.Series('sheet', sheet_ids))
+
+    sheets_data = df_sheet.join(sheets.sheets_data, on='sheet', how='left')
 
     def on_select_sheet(id: str):
         print('OPEN SHEET: ', id)
