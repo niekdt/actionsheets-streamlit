@@ -41,7 +41,7 @@ def generate_landing_view():
     with metric_grid.container():
         stylable_metric(
             label='Actionsheets',
-            value=f'{all_sheets.sheets_data.height:,d}',
+            value=f'{all_sheets.sheets_data.filter(pl.col("snippets") > 10).height:,d}',
             background_color='var(--sheet-color)'
         )
 
