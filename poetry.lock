@@ -2,7 +2,7 @@
 
 [[package]]
 name = "actionsheets"
-version = "0.2.0"
+version = "0.3.0"
 description = "Provides a large collection of searchable quick-reference code-snippet sheets defined in terms of a desired action and corresponding code snippet."
 optional = false
 python-versions = "^3.11"
@@ -17,7 +17,7 @@ rich = "^13.7"
 type = "git"
 url = "https://github.com/niekdt/actionsheets.git"
 reference = "HEAD"
-resolved_reference = "47e3f8fa9abfc91cf7e141e8ed73e03e16e886c4"
+resolved_reference = "052a8fdc4e773635780a5b0043eb585c28ff6a87"
 
 [[package]]
 name = "altair"
