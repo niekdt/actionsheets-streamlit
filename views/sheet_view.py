@@ -70,6 +70,13 @@ def _generate_sheet_header(sheet_data: ActionsheetView):
         <h1 class="sheet" style="padding-top: 0px;"><em>{sheet_info["title"]}</em> actionsheet</h1>
     ''')
 
+    if sheet_info['partial']:
+        st.warning(
+            'This sheet is incomplete and could use some attention. '
+            'Please submit code snippet suggestions as an issue or PR '
+            '[here](https://github.com/niekdt/actionsheets/issues).'
+        )
+
     with stylable_container(
             key='sheet-info',
             css_styles='''
