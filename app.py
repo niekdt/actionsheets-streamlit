@@ -260,7 +260,7 @@ with st.sidebar:
             st.session_state['filtered_sheet_data'] = search_view
         else:
             st.warning('No snippets found')
-            if 'filtered_sheet_data' not in st.session_state:
+            if 'filtered_sheet_data' in st.session_state:
                 del st.session_state['filtered_sheet_data']
 
 
