@@ -9,6 +9,7 @@ from streamlit_extras.row import row
 from streamlit_extras.stylable_container import stylable_container
 
 from data import get_sheet_info, get_sheet, get_all_sheets
+from events import on_search_snippet, on_clear_snippet_search
 from sidebar import sheet_toc
 from ui import inline_markdown_html
 
@@ -30,12 +31,12 @@ def generate_filtered_sheet_view():
             label=f'No filtered sheet data for sheet {st.session_state["sheet"]}',
             status='error'
         )
-    all_sheet_data: ActionsheetView = get_sheet(st.session_state['sheet'])
+        return
     sheet_data: ActionsheetView = st.session_state['filtered_sheet_data']
     assert type(sheet_data) is ActionsheetView
 
     _init()
-    _generate_sheet_header(sheet_data)
+    _generate_sheet_header(sheet_data, query=st.session_state['last_search_snippet'])
 
     if sheet_data.data.height:
         _generate_sections(sheet_data, section='')
@@ -51,7 +52,7 @@ def _init():
     lexers = {lang: get_lexer_by_name(lang) for lang in languages}
 
 
-def _generate_sheet_header(sheet_data: ActionsheetView):
+def _generate_sheet_header(sheet_data: ActionsheetView, query: str = ''):
     sheet_info = get_sheet_info(st.session_state['sheet'])
     sheet_path = sheet_info['sheet'].split(sep='.')
     if len(sheet_path) > 1:
@@ -69,6 +70,22 @@ def _generate_sheet_header(sheet_data: ActionsheetView):
         </div>
         <h1 class="sheet" style="padding-top: 0px;"><em>{sheet_info["title"]}</em> actionsheet</h1>
     ''')
+
+    # Filter UI
+    st.text_input(
+        key='search_snippet2',
+        args=('search_snippet2',),
+        label='Search snippet',
+        placeholder='Search snippets',
+        label_visibility='collapsed',
+        on_change=on_search_snippet
+    )
+    if query:
+        col_filter, col_btn = st.columns([1, 2], vertical_alignment='center')
+        with col_filter:
+            st.info(f'*Showing **{sheet_data.count_snippets()}** snippets based on query "{query}"*')
+        with col_btn:
+            st.button('Remove filter', on_click=on_clear_snippet_search)
 
     if sheet_info['partial']:
         st.warning(
@@ -104,6 +121,7 @@ def _generate_sheet_header(sheet_data: ActionsheetView):
         if 'code' in sheet_info and sheet_info['code']:
             st.html('<h4 class="sheet">Code</h4>')
             st.html(highlight(sheet_info['code'], lexers[sheet_info['language']], formatter))
+        st.write('')
 
     with sheet_info_row.container():
         st.html('<h4 class="sheet">Sections</h4>')

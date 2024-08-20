@@ -1,4 +1,3 @@
-import itertools
 from os import path
 from typing import Literal
 
@@ -9,6 +8,7 @@ from streamlit_extras.stylable_container import stylable_container
 from importlib.metadata import version
 
 from data import get_all_sheets
+from events import on_select_sheet, on_search_snippet
 from sidebar import sheet_toc
 from views.home_view import generate_landing_view
 from views.sheet_view import generate_sheet_view, generate_filtered_sheet_view
@@ -205,11 +205,6 @@ with st.sidebar:
 
     sheets_data = df_sheet.join(sheets.sheets_data, on='sheet', how='left')
 
-    def on_select_sheet(id: str):
-        print('OPEN SHEET: ', id)
-        st.session_state['view'] = 'sheet'
-        st.session_state['sheet'] = id
-
     with stylable_container(
             key='sheets_menu',
             css_styles=[
@@ -245,29 +240,10 @@ has_sheet = sheets.has_sheet(active_sheet_id)
 with st.sidebar:
     sac.divider(label='Actionsheet sections', color='yellow', size='md')
 
-    def on_search_snippet():
-        print('SEARCH SNIPPET')
-        query = st.session_state['search_snippet']
-
-        active_sheet = sheets.sheet_view(active_sheet_id)
-        snippets = active_sheet.find_snippets(query=query)['entry'].to_list()
-
-        if snippets:
-            search_view = active_sheet.filter(snippets)
-
-            st.session_state['view'] = 'sheet_result'
-            st.session_state['search_snippet'] = ''
-            st.session_state['filtered_sheet_data'] = search_view
-        else:
-            st.warning('No snippets found')
-            if 'filtered_sheet_data' in st.session_state:
-                del st.session_state['filtered_sheet_data']
-
-
     st.text_input(
         key='search_snippet',
         label='Search snippets',
-        placeholder='Search snippet',
+        placeholder='Search snippets',
         label_visibility='collapsed',
         disabled=not has_sheet,
         on_change=on_search_snippet
