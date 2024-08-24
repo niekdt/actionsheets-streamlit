@@ -30,8 +30,8 @@ def on_select_sheet(id: str):
     st.session_state['sheet'] = id
 
 
-def on_quicksearch():
-    query = st.session_state['quick_search']
+def on_quicksearch(key: str = 'quick_search'):
+    query = st.session_state[key]
     print('QUICK SEARCH query: ', query)
     search_results = sheets.filter(st.session_state['lang'].lower()).find_snippets(query)
 

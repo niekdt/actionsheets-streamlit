@@ -3,6 +3,8 @@ import streamlit as st
 import streamlit_antd_components as sac
 
 from streamlit_extras.grid import grid
+
+from events import on_quicksearch
 from ui import stylable_metric
 from data import get_all_sheets
 
@@ -51,6 +53,15 @@ def generate_landing_view():
             value=f'{all_sheets.count_snippets():,d}',
             background_color='var(--section-color)'
         )
+
+    st.text_input(
+        key='quick_search2',
+        label='Search all',
+        placeholder=f'Quick search for {st.session_state["lang"]} snippets',
+        label_visibility='collapsed',
+        on_change=on_quicksearch,
+        args=('quick_search2',)
+    )
 
     st.markdown('''
     **Actionsheets** is an open-source (hobby) project with a different take on cheatsheets. 
