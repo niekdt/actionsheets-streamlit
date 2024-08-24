@@ -58,7 +58,6 @@ def _generate_sheet_header(sheet_data: ActionsheetView, query: str = ''):
     sheet_id = st.session_state['sheet']
     sheet_info = get_sheet_info(sheet_id)
 
-    sheets = get_all_sheets()
     parent_sheets = list(accumulate(sheet_id.split('.'), lambda x, y: '.'.join([x, y])))[:-1]
     parent_names = [get_sheet_info(s)['title'] for s in parent_sheets]
 
@@ -67,7 +66,7 @@ def _generate_sheet_header(sheet_data: ActionsheetView, query: str = ''):
     def gen_sheet_button(id, name):
         return st.button(
             key=f'sheet_btn_{id}',
-            label=f'{name} **›**',
+            label=name,
             on_click=on_select_sheet,
             args=(id,),
             use_container_width=True
@@ -83,7 +82,7 @@ def _generate_sheet_header(sheet_data: ActionsheetView, query: str = ''):
                     color: black;
                 }""",
             ):
-                gen_sheet_button(parent_sheets[0], parent_names[0])
+                gen_sheet_button(parent_sheets[0], f'{parent_names[0]}  **›**')
 
     if len(parent_sheets) > 1:
         for name, id, path_col in zip(parent_names[1:], parent_sheets[1:], path_cols[1:]):
@@ -96,11 +95,38 @@ def _generate_sheet_header(sheet_data: ActionsheetView, query: str = ''):
                             color: black;
                         }""",
                 ):
-                    gen_sheet_button(id, name)
+                    gen_sheet_button(id, f'{name}  **›**')
 
     st.html(f'''
         <h1 class="sheet" style="padding-top: 0px;"><em>{sheet_info["title"]}</em> actionsheet</h1>
     ''')
+
+    # Child sheets
+    sheets = get_all_sheets()
+    child_sheet_ids = list(set(sheets.sheets(parent=sheet_id, nested=False)) - {sheet_id})
+
+    print(child_sheet_ids)
+
+    if child_sheet_ids:
+        child_items = [
+            sac.ButtonsItem(label=get_sheet_info(id)['title'], color='#40C057')
+            for id in child_sheet_ids
+        ]
+        child_index = sac.buttons(
+            key='child_sheets',
+            items=[sac.ButtonsItem('Nested sheets: ', color='gray')] + child_items,
+            align='start',
+            size='sm',
+            index=None,
+            gap='xs',
+            variant='link',
+            use_container_width=False,
+            return_index=True
+        )
+        if child_index:
+            child_sheet_id = child_sheet_ids[child_index - 1]
+            on_select_sheet(child_sheet_id)
+            del st.session_state['child_sheets']
 
     # Filter UI
     st.text_input(
