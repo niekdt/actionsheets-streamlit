@@ -32,6 +32,7 @@ def on_select_sheet(id: str):
 
 def on_quicksearch(key: str = 'quick_search'):
     query = st.session_state[key]
+    st.session_state['last_quick_search'] = query
     print('QUICK SEARCH query: ', query)
     search_results = sheets.filter(st.session_state['lang'].lower()).find_snippets(query)
 
@@ -39,11 +40,8 @@ def on_quicksearch(key: str = 'quick_search'):
 
     if search_results.count_snippets() > 0:
         st.session_state['quick_search'] = ''
-        st.session_state['filtered_sheets_data'] = search_results
-    else:
-        st.warning('No sheets found')
-        if 'filtered_sheets_data' not in st.session_state:
-            del st.session_state['filtered_sheets_data']
+
+    st.session_state['filtered_sheets_data'] = search_results
 
 
 def on_search_sheet():
@@ -60,7 +58,7 @@ def on_search_sheet():
         st.session_state['actionsheets_menu'] = sheet_id
         st.session_state['search_sheet'] = ''
     else:
-        st.session_state['view'] = 'sheets_result'
+        st.error(f'No sheet found for "{query}"')
 
 
 def on_clear_snippet_search():

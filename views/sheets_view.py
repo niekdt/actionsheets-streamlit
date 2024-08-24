@@ -3,20 +3,32 @@ import streamlit as st
 import streamlit_antd_components as sac
 from actionsheets.sheets import Actionsheets
 
+from events import on_quicksearch
 from views.sheet_view import _generate_snippets, _init
 
 
 def generate_sheets_results():
-    st.title('Quick search results')
+    st.text_input(
+        key='quick_search3',
+        label='Search all',
+        placeholder=f'Quick search for {st.session_state["lang"]} snippets',
+        label_visibility='collapsed',
+        on_change=on_quicksearch,
+        args=('quick_search3',)
+    )
 
-    if 'filtered_sheets_data' not in st.session_state:
+    st.title('Quick search results')
+    results: Actionsheets = st.session_state['filtered_sheets_data']
+    query = st.session_state["last_quick_search"]
+
+    if results.count_snippets() == 0:
         sac.result(
-            label=f'No results for query<br>"{st.session_state["quick_search"]}"',
+            label=f'No results for query<br>"{query}"',
             status='warning'
         )
         return
 
-    results: Actionsheets = st.session_state['filtered_sheets_data']
+    st.markdown(f'Query: "{query}"')
 
     def on_click_sheet(id):
         print('JUMP TO SHEET: ', id)
