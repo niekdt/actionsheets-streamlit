@@ -286,26 +286,24 @@ with st.sidebar:
         indent=10
     )
 
-if active_view:
-    if active_view == 'home':
+match active_view:
+    case 'home':
         generate_landing_view()
-    elif active_view == 'struct':
+    case 'struct':
         generate_structure_view()
-    elif active_view == 'sheet':
+    case 'sheet':
         if has_sheet:
             generate_sheet_view()
         else:
             sac.result(label=f'Sheet "{active_sheet_id}" is undefined', status='error')
-    elif active_view == 'sheet_result':
+    case 'sheet_result':
         if has_sheet:
             generate_filtered_sheet_view()
         else:
             sac.result(label=f'Sheet "{active_sheet_id}" is undefined', status='error')
-    elif active_view == 'sheets_result':
+    case 'sheets_result':
         generate_sheets_results()
-    else:
+    case _:
         sac.result(label=f'undefined view: {active_view}', status='error')
-else:
-    sac.result(label=f'no defined view', status='error')
 
 st.session_state['static'] = False
