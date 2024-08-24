@@ -8,7 +8,8 @@ from streamlit_extras.stylable_container import stylable_container
 from importlib.metadata import version
 
 from data import get_all_sheets
-from events import on_select_sheet, on_search_snippet
+from events import on_select_sheet, on_search_snippet, on_click_home, on_click_struct, \
+    on_select_language, on_quicksearch, on_search_sheet
 from sidebar import sheet_toc
 from views.home_view import generate_landing_view
 from views.sheet_view import generate_sheet_view, generate_filtered_sheet_view
@@ -59,15 +60,6 @@ with open(path.join('.streamlit', 'style.css')) as f:
 
 # Sidebar
 with st.sidebar:
-    def on_click_home():
-        st.session_state['view'] = 'home'
-        st.session_state['static'] = True
-
-    def on_click_struct():
-        st.session_state['view'] = 'struct'
-        st.session_state['static'] = True
-
-
     with stylable_container(
             key='home',
             css_styles=[
@@ -110,16 +102,6 @@ with st.sidebar:
 
     sac.divider('Programming language', color='blue', size='xl')
 
-
-    def on_select_language():
-        lang = st.session_state['lang_select']
-        print('CHANGE TO LANGUAGE: ', lang)
-        st.session_state['lang'] = lang
-        st.session_state['view'] = 'sheet'  # TODO: implement "sheets" view
-        st.session_state['sheet'] = lang.lower()
-        st.session_state['search_sheet'] = ''
-
-
     langs = sorted(sheets.sheets_data.filter(pl.col('sheet_parent') == '')['title'])
     st.selectbox(
         key='lang_select',
@@ -132,22 +114,6 @@ with st.sidebar:
     )
 
 with st.sidebar:
-    def on_quicksearch():
-        query = st.session_state['quick_search']
-        print('QUICK SEARCH query: ', query)
-        search_results = sheets.filter(active_lang.lower()).find_snippets(query)
-
-        st.session_state['view'] = 'sheets_result'
-
-        if search_results.count_snippets() > 0:
-            st.session_state['quick_search'] = ''
-            st.session_state['filtered_sheets_data'] = search_results
-        else:
-            st.warning('No sheets found')
-            if 'filtered_sheets_data' not in st.session_state:
-                del st.session_state['filtered_sheets_data']
-
-
     st.text_input(
         key='quick_search',
         label='Search all',
@@ -157,24 +123,6 @@ with st.sidebar:
     )
 
     sac.divider(label='Actionsheets', color='green', size='lg')
-
-
-    def on_search_sheet():
-        query = st.session_state['search_sheet']
-        print('SEARCH SHEET FOR QUERY: ', query)
-        sheet_id = sheets.filter(active_lang.lower()).find_sheet(query=query)
-
-        print('RESULT: ', sheet_id)
-        st.session_state['view'] = 'sheet'
-        st.session_state['static'] = True
-
-        if sheet_id:
-            st.session_state['sheet'] = sheet_id
-            st.session_state['actionsheets_menu'] = sheet_id
-            st.session_state['search_sheet'] = ''
-        else:
-            st.session_state['view'] = 'sheets_result'
-
 
     st.text_input(
         key='search_sheet',
