@@ -6,7 +6,13 @@ The name “actionsheets” comes from the way the sheets are structured: code s
 What separates this app from typical cheatsheet websites is that the sheets are dynamically rendered from a data source. 
 This enables search functions for sheets and snippets, and generating filtered sheets.
 
-![dashboard](https://github.com/user-attachments/assets/c5ff5472-a80e-4228-af1f-fea9f55c024a)
+![afbeelding](https://github.com/user-attachments/assets/8999e0c0-f7d5-4c16-9f19-6768000f4ec4)
+
+
+### Quick search for snippets
+![afbeelding](https://github.com/user-attachments/assets/8e8fe91f-99a1-439e-9128-8e35559ee378)
+
+
 
 ## Usage
 To start the dashboard locally, run:
