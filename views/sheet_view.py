@@ -1,3 +1,5 @@
+from itertools import accumulate
+
 import polars as pl
 import streamlit as st
 import streamlit_antd_components as sac
@@ -9,7 +11,7 @@ from streamlit_extras.row import row
 from streamlit_extras.stylable_container import stylable_container
 
 from data import get_sheet_info, get_sheet, get_all_sheets
-from events import on_search_snippet, on_clear_snippet_search
+from events import on_search_snippet, on_clear_snippet_search, on_select_sheet
 from sidebar import sheet_toc
 from ui import inline_markdown_html
 
@@ -53,21 +55,50 @@ def _init():
 
 
 def _generate_sheet_header(sheet_data: ActionsheetView, query: str = ''):
-    sheet_info = get_sheet_info(st.session_state['sheet'])
-    sheet_path = sheet_info['sheet'].split(sep='.')
-    if len(sheet_path) > 1:
-        del sheet_path[-1]
-    lang_html = f'<span style="color: var(--lang-color)">{sheet_path[0]}</span>'
-    sheets_path_html = (
-            '<span class="sheet">' +
-            '</span> › <span class="sheet">'.join(sheet_path[1:])
-    )
+    sheet_id = st.session_state['sheet']
+    sheet_info = get_sheet_info(sheet_id)
+
+    sheets = get_all_sheets()
+    parent_sheets = list(accumulate(sheet_id.split('.'), lambda x, y: '.'.join([x, y])))[:-1]
+    parent_names = [get_sheet_info(s)['title'] for s in parent_sheets]
+
+    path_cols = st.columns([1] * (1 + len(parent_sheets) * 2))
+
+    def gen_sheet_button(id, name):
+        return st.button(
+            key=f'sheet_btn_{id}',
+            label=f'{name} **›**',
+            on_click=on_select_sheet,
+            args=(id,),
+            use_container_width=True
+        )
+
+    if parent_sheets:
+        with path_cols[0]:
+            with stylable_container(
+                key='lang_container',
+                css_styles="""
+                button {
+                    background-color: var(--lang-color);
+                    color: black;
+                }""",
+            ):
+                gen_sheet_button(parent_sheets[0], parent_names[0])
+
+    if len(parent_sheets) > 1:
+        for name, id, path_col in zip(parent_names[1:], parent_sheets[1:], path_cols[1:]):
+            with path_col:
+                with stylable_container(
+                        key='sheet_container',
+                        css_styles="""
+                        button {
+                            background-color: var(--sheet-color);
+                            color: black;
+                        }""",
+                ):
+                    gen_sheet_button(id, name)
+
     st.html(f'''
-        <div style="margin-top: 20px; font-size: 16pt">
-            {lang_html}
-             › 
-            {sheets_path_html}
-        </div>
         <h1 class="sheet" style="padding-top: 0px;"><em>{sheet_info["title"]}</em> actionsheet</h1>
     ''')
 
